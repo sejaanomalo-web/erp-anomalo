@@ -1,26 +1,165 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@layer base {
+  :root,
+  [data-theme="dark"] {
+    --background: #000000;
+    --background-alt: #0f0f12;
+    --surface-1: #0f0f12;
+    --surface-2: #16161b;
+    --surface-3: #1c1c22;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+    --accent: #c9953a;
+    --accent-subtle: rgba(201, 149, 58, 0.1);
+    --accent-strong: rgba(201, 149, 58, 0.4);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --text-1: #ffffff;
+    --text-2: #c7cdd9;
+    --text-3: #8a93a3;
+    --text-4: #5b6473;
+
+    --border-thin: rgba(255, 255, 255, 0.06);
+    --border-medium: rgba(255, 255, 255, 0.1);
+    --border-accent: rgba(201, 149, 58, 0.4);
+
+    --rail-width: 240px;
+    --rail-width-collapsed: 72px;
+
+    --success: #16a34a;
+    --warning: #eab308;
+    --error: #ef4444;
+
+    color-scheme: dark;
+  }
+
+  [data-theme="light"] {
+    --background: #ffffff;
+    --background-alt: #f7f7f8;
+    --surface-1: #ffffff;
+    --surface-2: #f0f0f1;
+    --surface-3: #e8e8ea;
+
+    --accent: #c9953a;
+    --accent-subtle: rgba(201, 149, 58, 0.1);
+    --accent-strong: rgba(201, 149, 58, 0.4);
+
+    --text-1: #0a0a0a;
+    --text-2: #2a2a2e;
+    --text-3: #5a5a62;
+    --text-4: #9a9aa3;
+
+    --border-thin: rgba(0, 0, 0, 0.08);
+    --border-medium: rgba(0, 0, 0, 0.12);
+    --border-accent: rgba(201, 149, 58, 0.4);
+
+    color-scheme: light;
+  }
+
+  * {
+    border-color: var(--border-thin);
+  }
+
+  html {
+    background: var(--background);
+    color: var(--text-1);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--text-1);
+    font-family: var(--font-inter), system-ui, sans-serif;
+    font-feature-settings: "ss01", "cv11", "tnum";
+    min-height: 100vh;
+    overflow-x: clip;
+  }
+
+  h1,
+  h2 {
+    text-transform: uppercase;
+  }
+
+  ::selection {
+    background: var(--accent-subtle);
+    color: var(--text-1);
+  }
+
+  /* iOS Safari: prevent input zoom */
+  @media (max-width: 768px) {
+    input,
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .solid-surface {
+    background: var(--surface-1);
+    border: 1px solid var(--border-thin);
+    transition: background 200ms ease, border-color 200ms ease,
+      box-shadow 200ms ease;
+  }
+
+  .solid-surface-hover:hover {
+    background: var(--surface-2);
+    border-color: var(--accent-strong);
+    box-shadow: 0 0 0 1px rgba(201, 149, 58, 0.2);
+  }
+
+  .gold-divider {
+    width: 64px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.075em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@layer utilities {
+  .anomalo-mark {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    z-index: 30;
+    opacity: 0.08;
+    pointer-events: none;
+    color: var(--accent);
+  }
+
+  .focus-ring {
+    outline: none;
+    box-shadow: 0 0 0 1px var(--accent-strong);
+  }
 }
