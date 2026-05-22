@@ -12,17 +12,18 @@ import { toast } from "@/components/feedback/Toast";
 import { PRODUCAO_KANBAN_COLUMNS } from "@/lib/constants";
 import { formatDate } from "@/lib/utils";
 import { useMoverProducao, useProducoes } from "@/lib/queries/producoes";
-import { Hammer } from "lucide-react";
+import { Hammer, Image as ImageIcon } from "lucide-react";
 import type { ProducaoStatus } from "@/types/database.types";
 
 interface CardItem {
   id: string;
   status: ProducaoStatus;
   vendaNumero: number;
-  cliente: string;
   produto: string;
   responsavel: string;
   prazo: string | null;
+  fotoModelo: string | null;
+  fotoTecido: string | null;
 }
 
 export default function ProducaoPage() {
@@ -33,13 +34,11 @@ export default function ProducaoPage() {
     id: p.id,
     status: p.status,
     vendaNumero: p.venda?.numero ?? 0,
-    cliente: p.venda?.cliente?.nome ?? "—",
-    produto:
-      p.variante?.produto?.nome && p.variante.nome
-        ? `${p.variante.produto.nome} · ${p.variante.nome}`
-        : p.variante?.nome ?? "—",
+    produto: p.produto_descricao ?? "Produto sem descrição",
     responsavel: p.responsavel?.nome ?? "Sem responsável",
     prazo: p.data_fim_prevista,
+    fotoModelo: p.foto_modelo_url,
+    fotoTecido: p.foto_tecido_url,
   }));
 
   const columns: KanbanColumn<ProducaoStatus>[] = PRODUCAO_KANBAN_COLUMNS;
@@ -49,7 +48,7 @@ export default function ProducaoPage() {
       <Hero
         eyebrow="Fábrica"
         titulo="Produção"
-        descricao="Quadro arrastável. Mudar a coluna atualiza o status."
+        descricao="Quadro arrastável. Esta tela exibe apenas dados do produto, sem informações pessoais."
       />
       {producoes.isLoading ? (
         <LoadingState linhas={4} />
@@ -71,15 +70,41 @@ export default function ProducaoPage() {
             <>
               <div className="flex items-center justify-between gap-sm">
                 <span className="text-label-caps text-text-3">
-                  #{item.vendaNumero}
+                  Ref. #{item.vendaNumero}
                 </span>
                 <Badge tone="muted">{item.responsavel}</Badge>
               </div>
-              <span className="text-body-md text-text-1">{item.cliente}</span>
-              <span className="text-body-sm text-text-3">{item.produto}</span>
+              <span className="text-body-md text-text-1 line-clamp-3">
+                {item.produto}
+              </span>
+              {(item.fotoModelo || item.fotoTecido) && (
+                <div className="grid grid-cols-2 gap-xs">
+                  {item.fotoModelo && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={item.fotoModelo}
+                      alt="Modelo"
+                      className="w-full aspect-square object-cover border border-border-thin"
+                    />
+                  )}
+                  {item.fotoTecido && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={item.fotoTecido}
+                      alt="Tecido"
+                      className="w-full aspect-square object-cover border border-border-thin"
+                    />
+                  )}
+                  {!item.fotoModelo || !item.fotoTecido ? (
+                    <div className="w-full aspect-square border border-dashed border-border-thin flex items-center justify-center text-text-4">
+                      <ImageIcon size={16} strokeWidth={1.4} />
+                    </div>
+                  ) : null}
+                </div>
+              )}
               {item.prazo ? (
                 <span className="text-caption text-text-4">
-                  Entrega {formatDate(item.prazo)}
+                  Prazo {formatDate(item.prazo)}
                 </span>
               ) : null}
             </>

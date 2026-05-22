@@ -5,6 +5,11 @@ import { createClient } from "@/lib/supabase/client";
 import { queryKeys } from "./keys";
 import type { ProducaoStatus } from "@/types/database.types";
 
+/**
+ * Card de produção SEM informações pessoais do cliente:
+ * inclui só id da venda (curto), produto, prazo e responsável.
+ * O vendedor tem acesso à tela de Produção e não deve ver PII.
+ */
 export interface ProducaoCard {
   id: string;
   status: ProducaoStatus;
@@ -12,14 +17,13 @@ export interface ProducaoCard {
   data_fim_prevista: string | null;
   observacoes: string | null;
   venda: {
+    id: string;
     numero: number;
-    cliente: { nome: string } | null;
   } | null;
   responsavel: { nome: string } | null;
-  variante: {
-    nome: string;
-    produto: { nome: string } | null;
-  } | null;
+  produto_descricao: string | null;
+  foto_modelo_url: string | null;
+  foto_tecido_url: string | null;
 }
 
 export function useProducoes() {
@@ -30,7 +34,7 @@ export function useProducoes() {
       const { data, error } = await supabase
         .from("producoes")
         .select(
-          "id, status, prioridade, data_fim_prevista, observacoes, venda:vendas(numero, cliente:clientes(nome)), responsavel:profiles!responsavel_id(nome), venda_item:venda_itens(produto_variante:produto_variantes(nome, produto:produtos(nome)))",
+          "id, status, prioridade, data_fim_prevista, observacoes, venda:vendas(id, numero), responsavel:profiles!responsavel_id(nome), venda_item:venda_itens(produto_descricao, foto_modelo_url, foto_tecido_url)",
         )
         .order("prioridade", { ascending: false })
         .order("data_fim_prevista", { ascending: true })
@@ -44,13 +48,12 @@ export function useProducoes() {
           prioridade: number;
           data_fim_prevista: string | null;
           observacoes: string | null;
-          venda: { numero: number; cliente: { nome: string } | null } | null;
+          venda: { id: string; numero: number } | null;
           responsavel: { nome: string } | null;
           venda_item: {
-            produto_variante: {
-              nome: string;
-              produto: { nome: string } | null;
-            } | null;
+            produto_descricao: string | null;
+            foto_modelo_url: string | null;
+            foto_tecido_url: string | null;
           } | null;
         };
         return {
@@ -61,7 +64,9 @@ export function useProducoes() {
           observacoes: r.observacoes,
           venda: r.venda,
           responsavel: r.responsavel,
-          variante: r.venda_item?.produto_variante ?? null,
+          produto_descricao: r.venda_item?.produto_descricao ?? null,
+          foto_modelo_url: r.venda_item?.foto_modelo_url ?? null,
+          foto_tecido_url: r.venda_item?.foto_tecido_url ?? null,
         } as ProducaoCard;
       });
     },
@@ -79,7 +84,6 @@ export function useMoverProducao() {
         .eq("id", input.id);
       if (error) throw error;
 
-      // Audit log via API server-side
       fetch("/api/audit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

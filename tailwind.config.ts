@@ -20,6 +20,8 @@ const config: Config = {
         },
         accent: {
           DEFAULT: "var(--accent)",
+          hover: "var(--accent-hover)",
+          active: "var(--accent-active)",
           subtle: "var(--accent-subtle)",
           strong: "var(--accent-strong)",
         },
@@ -39,7 +41,8 @@ const config: Config = {
         error: "#ef4444",
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        sans: ["var(--font-manrope)", "system-ui", "sans-serif"],
+        display: ["var(--font-cormorant)", "Georgia", "serif"],
         mono: [
           "ui-monospace",
           "SFMono-Regular",
@@ -51,8 +54,8 @@ const config: Config = {
       },
       fontSize: {
         display: [
-          "2rem",
-          { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "700" },
+          "2.25rem",
+          { lineHeight: "1.05", letterSpacing: "0.01em", fontWeight: "700" },
         ],
         h1: [
           "2rem",
@@ -64,33 +67,33 @@ const config: Config = {
         ],
         h3: [
           "1.25rem",
-          { lineHeight: "1.15", letterSpacing: "-0.01em", fontWeight: "600" },
+          { lineHeight: "1.2", letterSpacing: "-0.01em", fontWeight: "600" },
         ],
         h4: [
           "1rem",
-          { lineHeight: "1.15", letterSpacing: "-0.01em", fontWeight: "600" },
+          { lineHeight: "1.2", letterSpacing: "-0.01em", fontWeight: "600" },
         ],
         h5: [
           "0.875rem",
-          { lineHeight: "1.15", letterSpacing: "-0.01em", fontWeight: "600" },
+          { lineHeight: "1.2", letterSpacing: "-0.01em", fontWeight: "600" },
         ],
         h6: [
           "0.8125rem",
-          { lineHeight: "1.15", letterSpacing: "-0.01em", fontWeight: "600" },
+          { lineHeight: "1.2", letterSpacing: "-0.01em", fontWeight: "600" },
         ],
-        "body-md": ["0.875rem", { lineHeight: "1.6", fontWeight: "400" }],
-        "body-sm": ["0.75rem", { lineHeight: "1.5", fontWeight: "400" }],
+        "body-md": ["0.9375rem", { lineHeight: "1.55", fontWeight: "400" }],
+        "body-sm": ["0.8125rem", { lineHeight: "1.5", fontWeight: "400" }],
         button: [
           "0.6875rem",
-          { lineHeight: "1", letterSpacing: "0.075em", fontWeight: "700" },
+          { lineHeight: "1", letterSpacing: "0.08em", fontWeight: "700" },
         ],
         "label-caps": [
           "0.75rem",
-          { lineHeight: "1.25", letterSpacing: "0.075em", fontWeight: "600" },
+          { lineHeight: "1.25", letterSpacing: "0.08em", fontWeight: "600" },
         ],
         caption: [
           "0.75rem",
-          { lineHeight: "1", letterSpacing: "0.06em", fontWeight: "400" },
+          { lineHeight: "1.1", letterSpacing: "0.06em", fontWeight: "400" },
         ],
       },
       spacing: {
@@ -115,10 +118,11 @@ const config: Config = {
       },
       boxShadow: {
         none: "none",
-        "hover-sm": "0 0 0 1px rgba(201,149,58,0.20)",
+        "hover-sm": "0 0 0 1px rgba(229,184,42,0.22)",
         "hover-md":
-          "0 0 0 1px rgba(201,149,58,0.40), 0 0 24px rgba(201,149,58,0.10)",
+          "0 0 0 1px rgba(229,184,42,0.42), 0 0 28px rgba(229,184,42,0.12)",
         elevated: "0 8px 24px rgba(0,0,0,0.6)",
+        "elevated-warm": "0 12px 32px rgba(229,184,42,0.08), 0 4px 12px rgba(0,0,0,0.6)",
       },
       transitionDuration: {
         fast: "150ms",

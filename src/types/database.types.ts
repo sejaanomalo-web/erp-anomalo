@@ -20,7 +20,12 @@ export type VendaStatus =
   | "pronto"
   | "expedicao"
   | "entregue"
-  | "cancelada";
+  | "cancelada"
+  | "assistencia";
+
+export type VendaTipo = "orcamento" | "venda";
+
+export type KanbanVendaColuna = "orcamento" | "fechado" | "entregue" | "assistencia";
 
 export type ProducaoStatus =
   | "aguardando_inicio"
@@ -67,6 +72,11 @@ export interface Empresa {
   updated_at: string;
 }
 
+export interface PermissoesExtras {
+  modulos_extras?: string[];
+  acoes_extras?: Record<string, string[]>;
+}
+
 export interface Profile {
   id: string;
   empresa_id: string | null;
@@ -77,6 +87,7 @@ export interface Profile {
   papel: Papel;
   ativo: boolean;
   avatar_url: string | null;
+  permissoes_extras: PermissoesExtras | null;
   created_at: string;
   updated_at: string;
 }
@@ -179,6 +190,7 @@ export interface Venda {
   numero: number;
   cliente_id: string;
   vendedor_id: string;
+  tipo: VendaTipo;
   status: VendaStatus;
   valor_total: number;
   desconto: number;
@@ -200,11 +212,43 @@ export interface Venda {
 export interface VendaItem {
   id: string;
   venda_id: string;
-  produto_variante_id: string;
+  produto_variante_id: string | null;
+  produto_descricao: string | null;
   quantidade: number;
   valor_unitario: number;
-  customizacoes: Json | null;
+  observacoes: Json | string | null;
+  foto_modelo_url: string | null;
+  foto_tecido_url: string | null;
   imagem_url: string | null;
+}
+
+export interface GoogleCalendarToken {
+  id: string;
+  usuario_id: string;
+  empresa_id: string | null;
+  access_token: string | null;
+  refresh_token: string;
+  expires_at: string | null;
+  scope: string | null;
+  calendar_id: string;
+  ultimo_sync_em: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AgendaEvento {
+  id: string;
+  empresa_id: string;
+  venda_id: string | null;
+  usuario_id: string;
+  google_event_id: string | null;
+  titulo: string;
+  inicio: string;
+  fim: string | null;
+  status_sync: "pendente" | "sincronizado" | "erro";
+  ultimo_erro: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Producao {

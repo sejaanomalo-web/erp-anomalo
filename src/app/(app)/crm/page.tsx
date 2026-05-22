@@ -1,116 +1,116 @@
 "use client";
 
-import { Users, Target, MessageSquareText, Phone } from "lucide-react";
+import Link from "next/link";
+import { Users, ArrowRight, MessageSquareText, Wallet } from "lucide-react";
 import { Hero } from "@/components/sections/Hero";
 import { KPICard } from "@/components/sections/KPICard";
 import { Card } from "@/components/ui/card";
-import { LeadStatusBadge } from "@/components/tables/StatusBadge";
-import { mockLeads } from "@/lib/mocks";
+import { LoadingState } from "@/components/feedback/LoadingState";
+import { useClientes } from "@/lib/queries/clientes";
+import { useVendas } from "@/lib/queries/vendas";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { LEAD_KANBAN_COLUMNS } from "@/lib/constants";
 
 export default function CrmPage() {
-  const totalLeads = mockLeads.length;
-  const ganhos = mockLeads.filter((l) => l.status === "ganho").length;
-  const taxa = totalLeads ? (ganhos / totalLeads) * 100 : 0;
-  const ticket = mockLeads.reduce((acc, l) => acc + l.valor_estimado, 0) / totalLeads;
+  const clientes = useClientes();
+  const vendas = useVendas();
+
+  const totalClientes = clientes.data?.length ?? 0;
+  const totalOrcamentos = (vendas.data ?? []).filter(
+    (v) => v.tipo === "orcamento",
+  ).length;
+  const totalVendas = (vendas.data ?? []).filter((v) => v.tipo === "venda");
+  const ticketMedio =
+    totalVendas.length > 0
+      ? totalVendas.reduce((acc, v) => acc + Number(v.valor_total), 0) /
+        totalVendas.length
+      : 0;
+
+  const ultimas = (vendas.data ?? []).slice(0, 6);
+
+  if (clientes.isLoading || vendas.isLoading) {
+    return (
+      <div className="flex flex-col gap-2xl">
+        <Hero
+          eyebrow="Relacionamento"
+          titulo="CRM"
+          descricao="Clientes vindos das vendas e visão de relacionamento."
+        />
+        <LoadingState linhas={6} />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-3xl">
       <Hero
         eyebrow="Relacionamento"
         titulo="CRM"
-        descricao="Pipeline de leads e métricas de conversão."
+        descricao="Cada cliente entra automaticamente quando uma venda ou orçamento é registrado."
       />
+
       <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-md">
         <KPICard
-          label="Leads ativos"
-          valor={totalLeads}
+          label="Clientes cadastrados"
+          valor={totalClientes}
           icone={<Users size={16} strokeWidth={1.8} />}
         />
         <KPICard
-          label="Taxa de conversão"
-          valor={taxa}
-          formato="percentual"
-          icone={<Target size={16} strokeWidth={1.8} />}
-        />
-        <KPICard
-          label="Ticket médio (lead)"
-          valor={ticket}
-          formato="moeda"
+          label="Orçamentos abertos"
+          valor={totalOrcamentos}
           icone={<MessageSquareText size={16} strokeWidth={1.8} />}
         />
         <KPICard
-          label="Próximas interações"
-          valor={mockLeads.filter((l) => l.proximo_contato).length}
-          icone={<Phone size={16} strokeWidth={1.8} />}
+          label="Vendas fechadas"
+          valor={totalVendas.length}
+          icone={<Wallet size={16} strokeWidth={1.8} />}
+        />
+        <KPICard
+          label="Ticket médio"
+          valor={ticketMedio}
+          formato="moeda"
         />
       </section>
 
       <section className="flex flex-col gap-md">
-        <span className="text-label-caps text-text-3">Pipeline</span>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-md">
-          {LEAD_KANBAN_COLUMNS.map((col) => {
-            const items = mockLeads.filter((l) => l.status === col.id);
-            return (
-              <Card key={col.id} className="p-md flex flex-col gap-md min-h-[160px]">
-                <div className="flex items-center justify-between">
-                  <span className="text-label-caps text-text-1">{col.titulo}</span>
-                  <span className="text-body-sm text-text-3 tabular-nums">
-                    {items.length}
+        <div className="flex items-center justify-between gap-md">
+          <span className="text-label-caps text-text-3">
+            Últimas movimentações
+          </span>
+          <Link
+            href="/crm/clientes"
+            className="text-body-sm text-text-3 hover:text-accent inline-flex items-center gap-xs"
+          >
+            Ver todos os clientes
+            <ArrowRight size={14} strokeWidth={1.8} />
+          </Link>
+        </div>
+        <Card className="divide-y divide-border-thin">
+          {ultimas.length === 0 ? (
+            <div className="p-lg text-body-sm text-text-3">
+              Nenhuma venda ou orçamento registrado ainda.
+            </div>
+          ) : (
+            ultimas.map((venda) => (
+              <Link
+                href={`/vendas/${venda.id}`}
+                key={venda.id}
+                className="flex items-center justify-between gap-md p-md hover:bg-surface-2 transition-colors duration-fast"
+              >
+                <div className="flex flex-col gap-xxs min-w-0">
+                  <span className="text-body-md text-text-1 truncate">
+                    {venda.cliente?.nome ?? "Cliente sem nome"}
+                  </span>
+                  <span className="text-body-sm text-text-3">
+                    {venda.tipo === "orcamento" ? "Orçamento" : "Venda"} #
+                    {venda.numero} · {formatDate(venda.data_venda)}
                   </span>
                 </div>
-                <ul className="flex flex-col gap-sm">
-                  {items.slice(0, 3).map((lead) => (
-                    <li key={lead.id} className="flex flex-col gap-xxs">
-                      <span className="text-body-md text-text-1 truncate">
-                        {lead.nome}
-                      </span>
-                      <span className="text-body-sm text-text-3 tabular-nums">
-                        {formatCurrency(lead.valor_estimado)}
-                      </span>
-                      <span className="text-caption text-text-4">
-                        {formatDate(lead.proximo_contato)}
-                      </span>
-                    </li>
-                  ))}
-                  {items.length === 0 ? (
-                    <li className="text-caption text-text-4">Vazio</li>
-                  ) : null}
-                </ul>
-                {items.length > 3 ? (
-                  <span className="text-caption text-text-4 mt-auto">
-                    +{items.length - 3} mais
-                  </span>
-                ) : null}
-              </Card>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="flex flex-col gap-md">
-        <span className="text-label-caps text-text-3">Últimos leads</span>
-        <Card className="divide-y divide-border-thin">
-          {mockLeads.slice(0, 5).map((lead) => (
-            <div
-              key={lead.id}
-              className="flex items-center justify-between gap-md p-md"
-            >
-              <div className="flex flex-col gap-xxs min-w-0">
-                <span className="text-body-md text-text-1 truncate">{lead.nome}</span>
-                <span className="text-body-sm text-text-3">
-                  {lead.vendedor} · próximo contato {formatDate(lead.proximo_contato)}
-                </span>
-              </div>
-              <div className="flex items-center gap-md">
                 <span className="text-body-md tabular-nums text-text-1">
-                  {formatCurrency(lead.valor_estimado)}
+                  {formatCurrency(Number(venda.valor_total))}
                 </span>
-                <LeadStatusBadge status={lead.status} />
-              </div>
-            </div>
-          ))}
+              </Link>
+            ))
+          )}
         </Card>
       </section>
     </div>

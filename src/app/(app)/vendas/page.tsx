@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Plus, ShoppingCart, Search } from "lucide-react";
+import { Plus, ShoppingCart, Search, Columns3 } from "lucide-react";
 import { Hero } from "@/components/sections/Hero";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -17,30 +18,53 @@ import { DataTable, type DataTableColumn } from "@/components/tables/DataTable";
 import { VendaStatusBadge } from "@/components/tables/StatusBadge";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { LoadingState } from "@/components/feedback/LoadingState";
-import { VENDA_STATUS_LABEL } from "@/lib/constants";
+import {
+  VENDA_STATUS_LABEL,
+  VENDA_TIPO_LABEL,
+  VENDA_TIPO_TONE,
+} from "@/lib/constants";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useVendas, type VendaListRow } from "@/lib/queries/vendas";
-import type { VendaStatus } from "@/types/database.types";
+import type { VendaStatus, VendaTipo } from "@/types/database.types";
 
 export default function VendasPage() {
   const [busca, setBusca] = useState("");
   const [status, setStatus] = useState<VendaStatus | "todos">("todos");
+  const [tipo, setTipo] = useState<VendaTipo | "todos">("todos");
   const buscaDebounced = useDebounce(busca, 200);
-  const vendas = useVendas({ status, busca: buscaDebounced });
+  const vendas = useVendas({ status, tipo, busca: buscaDebounced });
 
   const columns: DataTableColumn<VendaListRow>[] = [
     {
       key: "numero",
       label: "Nº",
-      render: (v) => <span className="tabular-nums text-text-1">#{v.numero}</span>,
+      render: (v) => (
+        <span className="tabular-nums text-text-1">#{v.numero}</span>
+      ),
       csv: (v) => `#${v.numero}`,
+    },
+    {
+      key: "tipo",
+      label: "Tipo",
+      render: (v) => (
+        <Badge tone={VENDA_TIPO_TONE[v.tipo]}>{VENDA_TIPO_LABEL[v.tipo]}</Badge>
+      ),
+      csv: (v) => VENDA_TIPO_LABEL[v.tipo],
+      hideOnMobile: true,
     },
     {
       key: "cliente",
       label: "Cliente",
       render: (v) => v.cliente?.nome ?? "—",
       csv: (v) => v.cliente?.nome ?? "",
+    },
+    {
+      key: "telefone",
+      label: "Telefone",
+      render: (v) => v.cliente?.telefone ?? "—",
+      csv: (v) => v.cliente?.telefone ?? "",
+      hideOnMobile: true,
     },
     {
       key: "vendedor",
@@ -64,7 +88,7 @@ export default function VendasPage() {
     },
     {
       key: "data_venda",
-      label: "Data venda",
+      label: "Cadastrado em",
       render: (v) => formatDate(v.data_venda),
       csv: (v) => formatDate(v.data_venda),
       hideOnMobile: true,
@@ -82,14 +106,22 @@ export default function VendasPage() {
       <Hero
         eyebrow="Operação"
         titulo="Vendas"
-        descricao="Filtre por status, vendedor ou cliente."
+        descricao="Orçamentos e vendas fechadas. Filtre, busque ou abra o Kanban."
         acoes={
-          <Button asChild>
-            <Link href="/vendas/nova">
-              <Plus size={14} strokeWidth={1.8} />
-              Nova venda
-            </Link>
-          </Button>
+          <div className="flex items-center gap-sm flex-wrap">
+            <Button variant="secondary" asChild>
+              <Link href="/vendas/kanban">
+                <Columns3 size={14} strokeWidth={1.8} />
+                Kanban
+              </Link>
+            </Button>
+            <Button asChild>
+              <Link href="/vendas/nova">
+                <Plus size={14} strokeWidth={1.8} />
+                Nova venda
+              </Link>
+            </Button>
+          </div>
         }
       />
 
@@ -112,6 +144,22 @@ export default function VendasPage() {
               className="pl-xl"
             />
           </div>
+        </div>
+        <div className="flex flex-col gap-xs">
+          <label className="text-label-caps text-text-3">Tipo</label>
+          <Select
+            value={tipo}
+            onValueChange={(v) => setTipo(v as VendaTipo | "todos")}
+          >
+            <SelectTrigger className="min-w-[160px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos</SelectItem>
+              <SelectItem value="orcamento">Orçamento</SelectItem>
+              <SelectItem value="venda">Venda fechada</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div className="flex flex-col gap-xs">
           <label className="text-label-caps text-text-3">Status</label>
@@ -137,7 +185,7 @@ export default function VendasPage() {
       {vendas.isLoading ? (
         <LoadingState linhas={6} />
       ) : vendas.error ? (
-        <Card error={vendas.error} />
+        <ErrorBox error={vendas.error as Error} />
       ) : (vendas.data?.length ?? 0) === 0 ? (
         <EmptyState
           icone={ShoppingCart}
@@ -167,7 +215,7 @@ export default function VendasPage() {
   );
 }
 
-function Card({ error }: { error: Error }) {
+function ErrorBox({ error }: { error: Error }) {
   return (
     <div className="solid-surface p-lg flex flex-col gap-xs">
       <span className="text-label-caps text-error">Erro</span>
