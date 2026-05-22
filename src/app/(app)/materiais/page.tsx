@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Plus, Boxes, ArrowDown, ArrowUp, Pencil } from "lucide-react";
+import Link from "next/link";
+import { Plus, Boxes, ArrowDown, ArrowUp, Pencil, History } from "lucide-react";
 import { Hero } from "@/components/sections/Hero";
 import { KPICard } from "@/components/sections/KPICard";
 import { Button } from "@/components/ui/button";
@@ -240,6 +241,12 @@ export default function MateriaisPage() {
             >
               <ArrowDown size={14} strokeWidth={1.8} />
               Entrada
+            </Button>
+            <Button variant="secondary" asChild>
+              <Link href="/materiais/historico">
+                <History size={14} strokeWidth={1.8} />
+                Histórico
+              </Link>
             </Button>
             <Button
               onClick={() => {

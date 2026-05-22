@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { exchangeCodeForTokens } from "@/lib/google/calendar";
 import { logAudit } from "@/lib/audit/logger";
+import { resolveAppUrl } from "@/lib/url";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +11,7 @@ export async function GET(request: NextRequest) {
   const code = url.searchParams.get("code");
   const stateParam = url.searchParams.get("state");
   const cookieState = request.cookies.get("google_oauth_state")?.value;
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? url.origin;
+  const appUrl = resolveAppUrl(request);
 
   if (!code) {
     return NextResponse.redirect(`${appUrl}/agenda?error=missing_code`);

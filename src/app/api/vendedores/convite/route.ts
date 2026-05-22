@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createClient as createBrowserStyleClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { logAudit } from "@/lib/audit/logger";
+import { resolveAppUrl } from "@/lib/url";
 
 export const dynamic = "force-dynamic";
 
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
 
   const serviceUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const appUrl = resolveAppUrl(request);
 
   if (!serviceUrl || !serviceKey) {
     return NextResponse.json(

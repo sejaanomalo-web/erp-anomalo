@@ -2,16 +2,17 @@ import { NextResponse, type NextRequest } from "next/server";
 import { nanoid } from "nanoid";
 import { createClient } from "@/lib/supabase/server";
 import { buildAuthUrl } from "@/lib/google/calendar";
+import { resolveAppUrl } from "@/lib/url";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(_request: NextRequest) {
+export async function GET(request: NextRequest) {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) {
-    return NextResponse.redirect(new URL("/login", _request.url));
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   const clientId = process.env.GOOGLE_CLIENT_ID;
@@ -25,8 +26,7 @@ export async function GET(_request: NextRequest) {
     );
   }
 
-  const appUrl =
-    process.env.NEXT_PUBLIC_APP_URL ?? new URL(_request.url).origin;
+  const appUrl = resolveAppUrl(request);
   const redirectUri = `${appUrl}/api/google/oauth/callback`;
   const state = nanoid(24);
 
