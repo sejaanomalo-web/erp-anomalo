@@ -1,13 +1,17 @@
 "use client";
 
 import { Suspense, useEffect, useMemo } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { startOfMonth, endOfMonth, addMonths } from "date-fns";
 import { Calendar, ExternalLink, RefreshCw, Plug, Unplug } from "lucide-react";
 import { Hero } from "@/components/sections/Hero";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CalendarView, type CalendarEvent } from "@/components/calendar/CalendarView";
+import {
+  CalendarView,
+  type CalendarEvent,
+} from "@/components/calendar/CalendarView";
 import { LoadingState } from "@/components/feedback/LoadingState";
 import { toast } from "@/components/feedback/Toast";
 import {
@@ -17,7 +21,8 @@ import {
   useDesconectarGoogle,
 } from "@/lib/queries/agenda";
 import { useVendas } from "@/lib/queries/vendas";
-import { formatDate } from "@/lib/utils";
+import { useLancamentos } from "@/lib/queries/financeiro";
+import { formatCurrency, formatDate } from "@/lib/utils";
 
 export default function AgendaPage() {
   return (
@@ -28,12 +33,27 @@ export default function AgendaPage() {
 }
 
 function AgendaContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const conexao = useAgendaConexao();
   const eventos = useAgendaEventos();
   const vendas = useVendas();
   const sync = useSincronizarGoogle();
   const desconectar = useDesconectarGoogle();
+
+  // Janela de 3 meses: mês anterior + atual + 2 próximos. Cobre lançamentos
+  // que aparecem no calendário enquanto o usuário navega entre meses.
+  const periodoFinanceiro = useMemo(() => {
+    const hoje = new Date();
+    return {
+      inicio: startOfMonth(addMonths(hoje, -1)).toISOString().slice(0, 10),
+      fim: endOfMonth(addMonths(hoje, 2)).toISOString().slice(0, 10),
+    };
+  }, []);
+  const lancamentos = useLancamentos({
+    inicio: periodoFinanceiro.inicio,
+    fim: periodoFinanceiro.fim,
+  });
 
   useEffect(() => {
     const connected = searchParams.get("connected");
@@ -46,14 +66,19 @@ function AgendaContent() {
     }
   }, [searchParams]);
 
-  // Mostra eventos sincronizados + entregas previstas das vendas
+  // Agrega:
+  //   • eventos sincronizados com Google (agenda_eventos)
+  //   • entregas previstas das vendas/orçamentos ativos
+  //   • lançamentos financeiros com vencimento (entradas e saídas)
   const eventosCalendar: CalendarEvent[] = useMemo(() => {
     const items: CalendarEvent[] = [];
+
     for (const e of eventos.data ?? []) {
       items.push({
-        id: e.id,
+        id: `agenda-${e.id}`,
         date: e.inicio,
         titulo: e.titulo,
+        categoria: "Agenda",
         tone:
           e.status_sync === "sincronizado"
             ? "success"
@@ -62,25 +87,63 @@ function AgendaContent() {
               : "warning",
       });
     }
+
     for (const v of vendas.data ?? []) {
       if (v.status === "entregue" || v.status === "cancelada") continue;
       items.push({
         id: `venda-${v.id}`,
         date: v.data_prevista_entrega,
         titulo: `#${v.numero} · ${v.cliente?.nome ?? "—"}`,
+        categoria: v.tipo === "orcamento" ? "Orçamento" : "Entrega",
+        descricao: `Entrega prevista · ${formatCurrency(Number(v.valor_total))}`,
         tone: v.tipo === "orcamento" ? "muted" : "accent",
         link: `/vendas/${v.id}`,
       });
     }
+
+    for (const l of lancamentos.data ?? []) {
+      const data = l.data_vencimento ?? l.data_competencia;
+      if (!data) continue;
+
+      let tone: CalendarEvent["tone"] = "neutral";
+      if (l.tipo === "entrada") {
+        tone = l.status === "pago" ? "success" : "accent";
+      } else {
+        if (l.status === "pago") tone = "muted";
+        else if (l.status === "atrasado") tone = "error";
+        else tone = "warning";
+      }
+
+      const categoria = l.tipo === "entrada" ? "Receita" : "Despesa";
+      const link =
+        l.tipo === "entrada" ? "/financeiro/entradas" : "/financeiro/saidas";
+
+      items.push({
+        id: `fin-${l.id}`,
+        date: data,
+        titulo: l.descricao,
+        categoria,
+        descricao: [
+          formatCurrency(Number(l.valor)),
+          l.forma_pagamento,
+          l.categoria?.nome,
+        ]
+          .filter(Boolean)
+          .join(" · "),
+        tone,
+        link,
+      });
+    }
+
     return items;
-  }, [eventos.data, vendas.data]);
+  }, [eventos.data, vendas.data, lancamentos.data]);
 
   return (
     <div className="flex flex-col gap-2xl">
       <Hero
         eyebrow="Agenda"
         titulo="Calendário"
-        descricao="Entregas previstas e sincronização com Google Agenda."
+        descricao="Entregas, vencimentos e sincronização com Google Agenda."
         acoes={
           <div className="flex items-center gap-sm flex-wrap">
             {conexao.data?.conectado ? (
@@ -172,7 +235,7 @@ function AgendaContent() {
         </div>
       </Card>
 
-      {vendas.isLoading || eventos.isLoading ? (
+      {vendas.isLoading || eventos.isLoading || lancamentos.isLoading ? (
         <LoadingState linhas={6} />
       ) : eventosCalendar.length === 0 ? (
         <Card className="p-lg flex flex-col items-center gap-md py-3xl">
@@ -184,18 +247,56 @@ function AgendaContent() {
           />
           <span className="text-h3 text-text-1">Sem eventos no momento.</span>
           <span className="text-body-md text-text-3">
-            Quando houver entregas previstas, elas aparecem aqui.
+            Quando houver entregas previstas ou lançamentos financeiros, eles
+            aparecem aqui.
           </span>
         </Card>
       ) : (
-        <CalendarView events={eventosCalendar} />
+        <CalendarView
+          events={eventosCalendar}
+          onEventClick={(ev) => {
+            if (ev.link) router.push(ev.link);
+          }}
+        />
       )}
 
+      <div className="flex flex-wrap gap-md text-body-sm text-text-3">
+        <Legenda tone="accent" label="Entrega de venda" />
+        <Legenda tone="muted" label="Orçamento" />
+        <Legenda tone="success" label="Receita / sync OK" />
+        <Legenda tone="warning" label="A vencer / pendente" />
+        <Legenda tone="error" label="Atrasado / erro" />
+      </div>
+
       <p className="text-caption text-text-4">
-        Sync atual é unidirecional: ERP envia entregas para o Google Agenda. A
-        leitura de eventos do Google de volta para o ERP entra em iteração
-        futura.
+        Clique em um dia para ver todos os compromissos. Clique em um evento
+        para abrir a tela de origem (venda, despesa ou receita).
       </p>
     </div>
+  );
+}
+
+function Legenda({
+  tone,
+  label,
+}: {
+  tone: "accent" | "muted" | "success" | "warning" | "error";
+  label: string;
+}) {
+  const dot =
+    tone === "accent"
+      ? "bg-accent"
+      : tone === "success"
+        ? "bg-success"
+        : tone === "warning"
+          ? "bg-warning"
+          : tone === "error"
+            ? "bg-error"
+            : "bg-text-4";
+  return (
+    <span className="inline-flex items-center gap-xs">
+      <span className={`h-2 w-2 rounded-full ${dot}`} />
+      {label}
+    </span>
   );
 }

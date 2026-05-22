@@ -14,8 +14,15 @@ import {
   subMonths,
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowRight, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
 export interface CalendarEvent {
@@ -24,6 +31,10 @@ export interface CalendarEvent {
   titulo: string;
   tone?: "neutral" | "accent" | "success" | "warning" | "error" | "muted";
   link?: string;
+  /** Texto auxiliar exibido no Sheet do dia (ex: valor, observação). */
+  descricao?: string;
+  /** Rotulo do tipo de evento (ex: "Entrega", "Despesa", "Receita"). */
+  categoria?: string;
 }
 
 interface CalendarViewProps {
@@ -42,14 +53,25 @@ const TONE_BG: Record<NonNullable<CalendarEvent["tone"]>, string> = {
   error: "bg-[rgba(239,68,68,0.12)] text-error border-[rgba(239,68,68,0.30)]",
 };
 
+const TONE_DOT: Record<NonNullable<CalendarEvent["tone"]>, string> = {
+  neutral: "bg-text-4",
+  muted: "bg-text-4",
+  accent: "bg-accent",
+  success: "bg-success",
+  warning: "bg-warning",
+  error: "bg-error",
+};
+
 export function CalendarView({
   events,
   onEventClick,
   initialView = "month",
   initialDate = new Date(),
 }: CalendarViewProps) {
+  const router = useRouter();
   const [view, setView] = useState<"month" | "list">(initialView);
   const [reference, setReference] = useState(initialDate);
+  const [diaSelecionado, setDiaSelecionado] = useState<Date | null>(null);
 
   const monthDays = useMemo(() => {
     const start = startOfWeek(startOfMonth(reference), { locale: ptBR });
@@ -82,6 +104,25 @@ export function CalendarView({
       return da.getTime() - db.getTime();
     });
   }, [events]);
+
+  function handleEventClick(ev: CalendarEvent) {
+    if (onEventClick) {
+      onEventClick(ev);
+      return;
+    }
+    if (ev.link) router.push(ev.link);
+  }
+
+  function handleDayClick(day: Date) {
+    const key = format(day, "yyyy-MM-dd");
+    const dayEvents = eventsByDay.get(key) ?? [];
+    if (dayEvents.length === 0) return;
+    setDiaSelecionado(day);
+  }
+
+  const eventosDoDia = diaSelecionado
+    ? eventsByDay.get(format(diaSelecionado, "yyyy-MM-dd")) ?? []
+    : [];
 
   return (
     <div className="flex flex-col gap-md">
@@ -146,12 +187,16 @@ export function CalendarView({
               const inMonth = isSameMonth(day, reference);
               const today = isSameDay(day, new Date());
               const dayEvents = eventsByDay.get(format(day, "yyyy-MM-dd")) ?? [];
+              const hasEvents = dayEvents.length > 0;
               return (
                 <div
                   key={day.toISOString()}
+                  onClick={() => hasEvents && handleDayClick(day)}
                   className={cn(
-                    "min-h-[96px] border-r border-b border-border-thin p-xs flex flex-col gap-xs",
+                    "min-h-[96px] border-r border-b border-border-thin p-xs flex flex-col gap-xs transition-colors duration-fast",
                     !inMonth && "bg-surface-1/40 text-text-4",
+                    hasEvents &&
+                      "cursor-pointer hover:bg-surface-2",
                   )}
                 >
                   <span
@@ -171,9 +216,12 @@ export function CalendarView({
                       <button
                         key={ev.id}
                         type="button"
-                        onClick={() => onEventClick?.(ev)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEventClick(ev);
+                        }}
                         className={cn(
-                          "text-left text-body-sm border px-[6px] py-[2px] truncate",
+                          "text-left text-body-sm border px-[6px] py-[2px] truncate hover:opacity-80 transition-opacity duration-fast",
                           TONE_BG[ev.tone ?? "neutral"],
                         )}
                       >
@@ -181,9 +229,16 @@ export function CalendarView({
                       </button>
                     ))}
                     {dayEvents.length > 3 ? (
-                      <span className="text-caption text-text-4">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDayClick(day);
+                        }}
+                        className="text-caption text-text-3 hover:text-accent text-left transition-colors duration-fast"
+                      >
                         +{dayEvents.length - 3} mais
-                      </span>
+                      </button>
                     ) : null}
                   </div>
                 </div>
@@ -204,7 +259,7 @@ export function CalendarView({
                 <button
                   key={ev.id}
                   type="button"
-                  onClick={() => onEventClick?.(ev)}
+                  onClick={() => handleEventClick(ev)}
                   className="flex items-center gap-md w-full p-md text-left hover:bg-surface-2 transition-colors duration-fast"
                 >
                   <div className="w-16 shrink-0 text-center">
@@ -220,18 +275,15 @@ export function CalendarView({
                       {ev.titulo}
                     </span>
                     <span className="block text-body-sm text-text-3">
-                      {format(d, "EEEE", { locale: ptBR })}
+                      {ev.categoria
+                        ? `${ev.categoria} · ${format(d, "EEEE", { locale: ptBR })}`
+                        : format(d, "EEEE", { locale: ptBR })}
                     </span>
                   </div>
                   <span
                     className={cn(
                       "h-2 w-2 rounded-full",
-                      ev.tone === "success" && "bg-success",
-                      ev.tone === "warning" && "bg-warning",
-                      ev.tone === "error" && "bg-error",
-                      (!ev.tone || ev.tone === "neutral" || ev.tone === "muted") &&
-                        "bg-text-4",
-                      ev.tone === "accent" && "bg-accent",
+                      TONE_DOT[ev.tone ?? "neutral"],
                     )}
                   />
                 </button>
@@ -240,6 +292,86 @@ export function CalendarView({
           )}
         </div>
       )}
+
+      <Sheet
+        open={Boolean(diaSelecionado)}
+        onOpenChange={(o) => !o && setDiaSelecionado(null)}
+      >
+        <SheetContent side="right" className="flex flex-col gap-0 p-0">
+          <SheetHeader className="border-b border-border-thin">
+            <div className="flex items-center justify-between gap-md">
+              <SheetTitle>
+                {diaSelecionado
+                  ? format(diaSelecionado, "EEEE, d 'de' MMMM", { locale: ptBR })
+                  : ""}
+              </SheetTitle>
+              <button
+                type="button"
+                aria-label="Fechar"
+                onClick={() => setDiaSelecionado(null)}
+                className="text-text-3 hover:text-text-1 transition-colors duration-fast"
+              >
+                <X size={20} strokeWidth={1.8} />
+              </button>
+            </div>
+            <p className="text-body-sm text-text-3">
+              {eventosDoDia.length === 1
+                ? "1 compromisso neste dia."
+                : `${eventosDoDia.length} compromissos neste dia.`}
+            </p>
+          </SheetHeader>
+
+          <div className="flex-1 overflow-y-auto scrollbar-thin divide-y divide-border-thin">
+            {eventosDoDia.length === 0 ? (
+              <div className="p-lg text-body-sm text-text-3">
+                Nenhum compromisso.
+              </div>
+            ) : (
+              eventosDoDia.map((ev) => (
+                <button
+                  key={ev.id}
+                  type="button"
+                  onClick={() => {
+                    handleEventClick(ev);
+                    setDiaSelecionado(null);
+                  }}
+                  className="w-full text-left p-lg flex items-start gap-md hover:bg-surface-2 transition-colors duration-fast"
+                >
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "mt-1 h-2 w-2 shrink-0 rounded-full",
+                      TONE_DOT[ev.tone ?? "neutral"],
+                    )}
+                  />
+                  <div className="flex-1 min-w-0">
+                    {ev.categoria ? (
+                      <span className="block text-label-caps text-text-3">
+                        {ev.categoria}
+                      </span>
+                    ) : null}
+                    <span className="block text-body-md text-text-1">
+                      {ev.titulo}
+                    </span>
+                    {ev.descricao ? (
+                      <span className="block text-body-sm text-text-3 mt-xxs">
+                        {ev.descricao}
+                      </span>
+                    ) : null}
+                  </div>
+                  {ev.link ? (
+                    <ArrowRight
+                      size={16}
+                      strokeWidth={1.8}
+                      className="text-text-3 shrink-0 mt-1"
+                    />
+                  ) : null}
+                </button>
+              ))
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
