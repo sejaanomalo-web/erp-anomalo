@@ -244,28 +244,6 @@ export default function DashboardPage() {
         )}
       </section>
 
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-md">
-        <Card className="p-lg flex flex-col gap-md">
-          <span className="text-label-caps text-text-3">Atalhos</span>
-          <div className="grid grid-cols-2 gap-sm">
-            {[
-              { href: "/vendas/nova", label: "Nova venda" },
-              { href: "/estoque/nova-entrada", label: "Entrada de estoque" },
-              { href: "/financeiro/entradas", label: "Lançar receita" },
-              { href: "/crm/clientes", label: "Clientes" },
-            ].map((atalho) => (
-              <Link
-                key={atalho.href}
-                href={atalho.href}
-                className="solid-surface solid-surface-hover p-md text-body-md text-text-1 flex items-center justify-between gap-sm"
-              >
-                {atalho.label}
-                <ArrowRight size={14} strokeWidth={1.8} className="text-text-3" />
-              </Link>
-            ))}
-          </div>
-        </Card>
-      </section>
     </div>
   );
 }
