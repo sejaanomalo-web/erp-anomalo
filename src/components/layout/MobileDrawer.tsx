@@ -44,9 +44,9 @@ export function MobileDrawer() {
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="left" className="p-0 bg-background" hideClose>
           <div className="flex items-center justify-between gap-2 px-4 h-16">
-            <div className="flex items-center gap-2 text-text-1 font-medium text-base">
+            <div className="flex items-center gap-2 text-text-1 font-semibold text-base tracking-[0.08em]">
               <AnomaloMark size={18} className="text-accent" decorative={false} />
-              Tato Estofados
+              TꓥTO ESTOFADOS
             </div>
             <button
               type="button"

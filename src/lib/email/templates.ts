@@ -6,8 +6,8 @@ function layout(titulo: string, corpoHtml: string) {
   <body style="background:#f6f8fc;color:#1f1f1f;font-family:Roboto,system-ui,sans-serif;margin:0;padding:40px 24px;">
     <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:560px;margin:0 auto;background:#ffffff;border:1px solid #dadce0;border-radius:12px;padding:32px;">
       <tr>
-        <td style="font-size:12px;font-weight:500;color:#5f6368;padding-bottom:12px;">
-          Tato Estofados
+        <td style="font-size:12px;font-weight:600;color:#5f6368;padding-bottom:12px;letter-spacing:0.08em;">
+          TꓥTO ESTOFADOS
         </td>
       </tr>
       <tr>
@@ -24,8 +24,8 @@ function layout(titulo: string, corpoHtml: string) {
         </td>
       </tr>
       <tr>
-        <td style="padding-top:24px;font-size:12px;color:#5f6368;border-top:1px solid #dadce0;margin-top:24px;">
-          Tato Estofados.
+        <td style="padding-top:24px;font-size:12px;color:#5f6368;border-top:1px solid #dadce0;margin-top:24px;letter-spacing:0.08em;font-weight:600;">
+          TꓥTO ESTOFADOS
         </td>
       </tr>
     </table>
@@ -38,7 +38,7 @@ export function resetSenhaTemplate(opts: { link: string; nome?: string }) {
     "Redefinir senha",
     `<p>${opts.nome ? `Olá, ${opts.nome}.` : "Olá."}</p>
      <p>Para criar uma nova senha, abra o link abaixo. Ele é válido por 24 horas.</p>
-     <p><a href="${opts.link}" style="color:#0b57d0;text-decoration:none;border-bottom:1px solid #0b57d0;">Redefinir senha</a></p>
+     <p><a href="${opts.link}" style="color:#c9953a;text-decoration:none;border-bottom:1px solid #c9953a;">Redefinir senha</a></p>
      <p>Se você não pediu, ignore este e-mail.</p>`,
   );
 }
@@ -49,9 +49,9 @@ export function conviteUsuarioTemplate(opts: {
   papel: string;
 }) {
   return layout(
-    "Acesso ao sistema Tato Estofados",
+    "Acesso ao sistema Tꓥto Estofados",
     `<p>Você foi convidado a acessar o sistema da ${opts.empresa}, como ${opts.papel}.</p>
-     <p><a href="${opts.link}" style="color:#0b57d0;text-decoration:none;border-bottom:1px solid #0b57d0;">Criar acesso</a></p>
+     <p><a href="${opts.link}" style="color:#c9953a;text-decoration:none;border-bottom:1px solid #c9953a;">Criar acesso</a></p>
      <p>O convite expira em 7 dias.</p>`,
   );
 }

@@ -12,20 +12,20 @@
     --surface-2: #f0f4f9;
     --surface-3: #e9eef6;
 
-    /* Google Blue 700 (GM2) — primary action / focus / link */
-    --accent: #0b57d0;
-    --accent-hover: #1a73e8;
-    --accent-active: #062e6f;
-    --accent-subtle: rgba(11, 87, 208, 0.08);
-    --accent-strong: rgba(11, 87, 208, 0.4);
+    /* Dourado Tato (#C9953A) — primary action / focus / link */
+    --accent: #c9953a;
+    --accent-hover: #d3a14a;
+    --accent-active: #a57a24;
+    --accent-subtle: rgba(201, 149, 58, 0.08);
+    --accent-strong: rgba(201, 149, 58, 0.4);
 
-    /* M3 secondary container — Compose pill, active nav-rail */
-    --compose: #c2e7ff;
-    --compose-foreground: #001d35;
+    /* M3 secondary container — Compose pill, active nav-rail (warm gold) */
+    --compose: #f5e0b0;
+    --compose-foreground: #4a370e;
 
-    /* M3 primary container — selected row tint */
-    --selected: #d3e3fd;
-    --selected-foreground: #001b3f;
+    /* M3 primary container — selected row tint (pale warm gold) */
+    --selected: #f0e0ba;
+    --selected-foreground: #3d2a0a;
 
     --text-1: #1f1f1f;
     --text-2: #444746;
@@ -34,7 +34,7 @@
 
     --border-thin: #dadce0;
     --border-medium: #c4c7c5;
-    --border-accent: rgba(11, 87, 208, 0.4);
+    --border-accent: rgba(201, 149, 58, 0.4);
 
     --rail-width: 256px;
     --rail-width-collapsed: 80px;
@@ -61,17 +61,17 @@
     --surface-2: #282828;
     --surface-3: #333333;
 
-    --accent: #a8c7fa;
-    --accent-hover: #c1d9ff;
-    --accent-active: #8db4f7;
-    --accent-subtle: rgba(168, 199, 250, 0.1);
-    --accent-strong: rgba(168, 199, 250, 0.4);
+    --accent: #e5be6b;
+    --accent-hover: #f2d188;
+    --accent-active: #c9a24f;
+    --accent-subtle: rgba(229, 190, 107, 0.1);
+    --accent-strong: rgba(229, 190, 107, 0.4);
 
-    --compose: #004a77;
-    --compose-foreground: #c2e7ff;
+    --compose: #3a2a0a;
+    --compose-foreground: #f5e0b0;
 
-    --selected: #062e6f;
-    --selected-foreground: #d2e3fc;
+    --selected: #2a1f0a;
+    --selected-foreground: #f0e0ba;
 
     --text-1: #e3e3e3;
     --text-2: #bdc1c6;
@@ -80,7 +80,7 @@
 
     --border-thin: #3c4043;
     --border-medium: #5f6368;
-    --border-accent: rgba(168, 199, 250, 0.4);
+    --border-accent: rgba(229, 190, 107, 0.4);
 
     --state-hover: rgba(255, 255, 255, 0.05);
     --state-focus: rgba(255, 255, 255, 0.08);

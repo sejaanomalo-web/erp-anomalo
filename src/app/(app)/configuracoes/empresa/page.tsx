@@ -176,7 +176,7 @@ export default function EmpresaPage() {
                 value={form.nome}
                 onChange={(e) => setForm({ ...form, nome: e.target.value })}
                 required
-                placeholder="Tato Estofados LTDA"
+                placeholder="Tꓥto Estofados LTDA"
               />
             </div>
             <div className="flex flex-col gap-xs">

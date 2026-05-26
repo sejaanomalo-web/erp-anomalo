@@ -256,9 +256,9 @@ export default function FormularioPublicoPage({
     return (
       <div className="min-h-screen bg-background flex items-center justify-center px-md py-2xl">
         <div className="w-full max-w-md flex flex-col gap-lg">
-          <div className="flex items-center gap-2 text-text-1 font-medium text-base">
+          <div className="flex items-center gap-2 text-text-1 font-semibold text-base tracking-[0.08em]">
             <AnomaloMark size={18} className="text-accent" decorative={false} />
-            Tato Estofados
+            TꓥTO ESTOFADOS
           </div>
           <div className="flex flex-col gap-sm">
             <Eyebrow>Venda registrada</Eyebrow>
@@ -281,9 +281,9 @@ export default function FormularioPublicoPage({
     <div className="min-h-screen bg-background px-md py-2xl">
       <div className="mx-auto w-full max-w-xl flex flex-col gap-lg">
         <div className="flex items-center justify-between gap-sm">
-          <div className="flex items-center gap-2 text-text-1 font-medium text-base">
+          <div className="flex items-center gap-2 text-text-1 font-semibold text-base tracking-[0.08em]">
             <AnomaloMark size={18} className="text-accent" decorative={false} />
-            Tato Estofados
+            TꓥTO ESTOFADOS
           </div>
           <span className="text-caption text-text-4">
             link · {token.slice(0, 6)}…

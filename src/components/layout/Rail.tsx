@@ -61,10 +61,10 @@ export function Rail({ collapsed, onToggle }: RailProps) {
         {collapsed ? null : (
           <Link
             href="/"
-            className="flex items-center gap-2 text-text-1 font-medium text-base"
+            className="flex items-center gap-2 text-text-1 font-semibold text-base tracking-[0.08em]"
           >
             <AnomaloMark size={18} className="text-accent" decorative={false} />
-            <span>Tato Estofados</span>
+            <span>TꓥTO ESTOFADOS</span>
           </Link>
         )}
       </div>
