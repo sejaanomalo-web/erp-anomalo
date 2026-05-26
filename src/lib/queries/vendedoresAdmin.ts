@@ -221,6 +221,23 @@ export function useDesativarVendedor() {
   });
 }
 
+export function useExcluirVendedor() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/vendedores/${id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.message ?? "Falha ao excluir usuário.");
+      }
+      return id;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.vendedores() });
+    },
+  });
+}
+
 export function useAtualizarPermissoes() {
   const qc = useQueryClient();
   return useMutation({

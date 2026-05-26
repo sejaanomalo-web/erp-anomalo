@@ -3,7 +3,7 @@
 import { use, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Pencil, UserMinus, UserCog } from "lucide-react";
+import { ArrowLeft, Pencil, UserMinus, UserCog, Trash2 } from "lucide-react";
 import { Hero } from "@/components/sections/Hero";
 import { KPICard } from "@/components/sections/KPICard";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -34,8 +34,10 @@ import { DataTable, type DataTableColumn } from "@/components/tables/DataTable";
 import {
   useAtualizarVendedorPerfil,
   useDesativarVendedor,
+  useExcluirVendedor,
   useVendedor,
 } from "@/lib/queries/vendedoresAdmin";
+import { useMeuPerfil } from "@/lib/queries/profiles";
 import { initials, formatCurrency, formatDate } from "@/lib/utils";
 import { VENDA_TIPO_LABEL, VENDA_TIPO_TONE } from "@/lib/constants";
 import type { Papel } from "@/types/database.types";
@@ -63,11 +65,14 @@ export default function VendedorDetalhePage({
   const { id } = use(params);
   const router = useRouter();
   const { data, isLoading, error } = useVendedor(id);
+  const meuPerfil = useMeuPerfil();
   const atualizar = useAtualizarVendedorPerfil();
   const desativar = useDesativarVendedor();
+  const excluir = useExcluirVendedor();
 
   const [editOpen, setEditOpen] = useState(false);
   const [confirmDeactivate, setConfirmDeactivate] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [form, setForm] = useState({
     nome: "",
     telefone: "",
@@ -229,7 +234,7 @@ export default function VendedorDetalhePage({
                 </Button>
                 {data.perfil.ativo ? (
                   <Button
-                    variant="destructive"
+                    variant="secondary"
                     onClick={() => setConfirmDeactivate(true)}
                   >
                     <UserMinus size={14} strokeWidth={1.8} />
@@ -255,6 +260,16 @@ export default function VendedorDetalhePage({
                     Reativar
                   </Button>
                 )}
+                {meuPerfil.data?.papel === "admin" &&
+                meuPerfil.data?.id !== id ? (
+                  <Button
+                    variant="destructive"
+                    onClick={() => setConfirmDelete(true)}
+                  >
+                    <Trash2 size={14} strokeWidth={1.8} />
+                    Excluir
+                  </Button>
+                ) : null}
               </div>
             }
           />
@@ -436,6 +451,28 @@ export default function VendedorDetalhePage({
           } catch (err) {
             toast.error(
               err instanceof Error ? err.message : "Falha ao desativar.",
+            );
+          }
+        }}
+      />
+
+      <ConfirmDialog
+        open={confirmDelete}
+        onOpenChange={setConfirmDelete}
+        titulo={`Excluir ${data.perfil.nome}?`}
+        descricao="Esta ação remove o usuário em definitivo (perfil + conta de acesso). Se houver vendas, lançamentos ou produções vinculadas, a exclusão é recusada — desative em vez de excluir, ou reatribua os registros antes."
+        variant="destructive"
+        textoConfirmar="Excluir usuário"
+        palavraConfirmacao="EXCLUIR"
+        onConfirm={async () => {
+          try {
+            await excluir.mutateAsync(id);
+            toast.success("Vendedor excluído.");
+            setConfirmDelete(false);
+            router.push("/vendedores");
+          } catch (err) {
+            toast.error(
+              err instanceof Error ? err.message : "Falha ao excluir.",
             );
           }
         }}
