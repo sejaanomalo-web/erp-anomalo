@@ -3,7 +3,6 @@
 import Link from "next/link";
 import {
   Palette,
-  Building2,
   Users,
   Bell,
   HardDrive,
@@ -14,7 +13,6 @@ import { Card } from "@/components/ui/card";
 
 const SECOES = [
   { href: "/configuracoes/aparencia", titulo: "Aparência", descricao: "Tema claro ou escuro.", icone: Palette },
-  { href: "/configuracoes/empresa", titulo: "Empresa", descricao: "Razão social, CNPJ e logo.", icone: Building2 },
   { href: "/configuracoes/usuarios", titulo: "Usuários", descricao: "Cadastros, papéis e status.", icone: Users },
   { href: "/configuracoes/notificacoes", titulo: "Notificações", descricao: "Preferências in-app e e-mail.", icone: Bell },
   { href: "/configuracoes/backup", titulo: "Backup", descricao: "Export e retenção.", icone: HardDrive },
