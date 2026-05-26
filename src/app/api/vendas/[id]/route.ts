@@ -5,6 +5,94 @@ import { logAudit } from "@/lib/audit/logger";
 
 export const dynamic = "force-dynamic";
 
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { id } = await params;
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ message: "Não autenticado." }, { status: 401 });
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("id, empresa_id, papel")
+    .eq("id", user.id)
+    .maybeSingle();
+  if (!profile?.empresa_id) {
+    return NextResponse.json(
+      { message: "Perfil sem empresa." },
+      { status: 400 },
+    );
+  }
+
+  const { data: venda } = await supabase
+    .from("vendas")
+    .select("id, numero, empresa_id, vendedor_id, tipo, status, valor_total")
+    .eq("id", id)
+    .maybeSingle();
+  if (!venda) {
+    return NextResponse.json(
+      { message: "Venda não encontrada." },
+      { status: 404 },
+    );
+  }
+
+  // Permissão: admin/gestor podem excluir qualquer; vendedor só as próprias
+  // E SÓ se ainda for orçamento (depois de fechada, exige admin/gestor).
+  const ehAdminOuGestor = ["admin", "gestor"].includes(
+    profile.papel as string,
+  );
+  const ehDono = (venda.vendedor_id as string) === profile.id;
+  const podeExcluir =
+    ehAdminOuGestor ||
+    (ehDono && profile.papel === "vendedor" && venda.tipo === "orcamento");
+
+  if (!podeExcluir) {
+    return NextResponse.json(
+      {
+        message:
+          venda.tipo === "venda"
+            ? "Apenas admin ou gestor pode excluir uma venda fechada."
+            : "Sem permissão para excluir.",
+      },
+      { status: 403 },
+    );
+  }
+
+  // CASCADE em venda_itens, producoes (via venda_id), lancamentos
+  // (referenciam venda mas com on delete set null no fk de venda_id; vamos
+  // limpar manualmente o lançamento de comissão associado).
+  await supabase.from("lancamentos_financeiros").delete().eq("venda_id", id);
+  await supabase.from("producoes").delete().eq("venda_id", id);
+  // venda_itens é CASCADE pelo fk; excluir venda cuida.
+
+  const { error: deleteErr } = await supabase
+    .from("vendas")
+    .delete()
+    .eq("id", id);
+  if (deleteErr) {
+    return NextResponse.json(
+      { message: deleteErr.message },
+      { status: 500 },
+    );
+  }
+
+  await logAudit({
+    modulo: "vendas",
+    acao: "delete",
+    entidade: "vendas",
+    entidadeId: id,
+    dadosAntes: JSON.parse(JSON.stringify(venda)),
+  });
+
+  return NextResponse.json({ ok: true });
+}
+
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },

@@ -3,7 +3,6 @@ import { z } from "zod";
 import { createClient as createBrowserStyleClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { logAudit } from "@/lib/audit/logger";
-import { resolveAppUrl } from "@/lib/url";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +12,35 @@ const schema = z.object({
   telefone: z.string().nullable().optional(),
   papel: z.enum(["admin", "gestor", "vendedor", "financeiro", "producao"]),
 });
+
+/**
+ * Gera senha temporária forte. 14 caracteres com pelo menos
+ * 1 maiúscula, 1 minúscula, 1 número e 1 símbolo simples.
+ */
+function gerarSenhaTemporaria(): string {
+  const lower = "abcdefghjkmnpqrstuvwxyz";
+  const upper = "ABCDEFGHJKMNPQRSTUVWXYZ";
+  const digits = "23456789";
+  const symbols = "!@#$%&*";
+  const all = lower + upper + digits + symbols;
+
+  const pick = (set: string) =>
+    set[Math.floor(Math.random() * set.length)] ?? "x";
+
+  const base = [
+    pick(lower),
+    pick(upper),
+    pick(digits),
+    pick(symbols),
+  ];
+  for (let i = 0; i < 10; i++) base.push(pick(all));
+  // Fisher-Yates
+  for (let i = base.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [base[i], base[j]] = [base[j], base[i]];
+  }
+  return base.join("");
+}
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
@@ -34,7 +62,7 @@ export async function POST(request: NextRequest) {
     !["admin", "gestor"].includes(profile.papel as string)
   ) {
     return NextResponse.json(
-      { message: "Apenas admin ou gestor podem convidar vendedores." },
+      { message: "Apenas admin ou gestor podem cadastrar vendedores." },
       { status: 403 },
     );
   }
@@ -51,13 +79,12 @@ export async function POST(request: NextRequest) {
 
   const serviceUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const appUrl = resolveAppUrl(request);
 
   if (!serviceUrl || !serviceKey) {
     return NextResponse.json(
       {
         message:
-          "Convite indisponível: SUPABASE_SERVICE_ROLE_KEY não está configurada na Vercel.",
+          "Cadastro indisponível: SUPABASE_SERVICE_ROLE_KEY não está configurada na Vercel.",
       },
       { status: 500 },
     );
@@ -67,19 +94,80 @@ export async function POST(request: NextRequest) {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
-  const { data: invite, error: inviteErr } =
-    await admin.auth.admin.inviteUserByEmail(input.email, {
-      data: {
+  // Cria usuário DIRETAMENTE com email_confirm + senha temporária.
+  // Sem dependência de Resend / SMTP. Você compartilha a senha
+  // manualmente (WhatsApp / verbal / SMS) com o vendedor.
+  const senhaTemporaria = gerarSenhaTemporaria();
+
+  const { data: created, error: createErr } =
+    await admin.auth.admin.createUser({
+      email: input.email,
+      password: senhaTemporaria,
+      email_confirm: true,
+      user_metadata: {
         nome: input.nome,
         papel: input.papel,
         empresa_id: profile.empresa_id,
       },
-      redirectTo: `${appUrl}/login`,
     });
 
-  if (inviteErr || !invite?.user) {
+  if (createErr || !created?.user) {
+    // Se já existir, tenta resetar a senha do usuário existente.
+    if (createErr?.message?.toLowerCase().includes("already")) {
+      // Buscar usuário pelo email via Auth Admin API (listUsers paginated)
+      const { data: list } = await admin.auth.admin.listUsers({
+        page: 1,
+        perPage: 200,
+      });
+      const existente = list?.users.find(
+        (u) => u.email?.toLowerCase() === input.email.toLowerCase(),
+      );
+      if (existente) {
+        const { error: updErr } = await admin.auth.admin.updateUserById(
+          existente.id,
+          { password: senhaTemporaria, email_confirm: true },
+        );
+        if (updErr) {
+          return NextResponse.json(
+            {
+              message: `Usuário já existe e a senha não pôde ser redefinida: ${updErr.message}`,
+            },
+            { status: 500 },
+          );
+        }
+        await admin
+          .from("profiles")
+          .update({
+            nome: input.nome,
+            papel: input.papel,
+            telefone: input.telefone ?? null,
+            empresa_id: profile.empresa_id,
+            ativo: true,
+          })
+          .eq("id", existente.id);
+
+        await logAudit({
+          modulo: "vendedores",
+          acao: "reset_password",
+          entidade: "profiles",
+          entidadeId: existente.id,
+          dadosDepois: {
+            email: input.email,
+            papel: input.papel,
+            empresa_id: profile.empresa_id,
+          },
+        });
+
+        return NextResponse.json({
+          usuario_id: existente.id,
+          email: input.email,
+          senha_temporaria: senhaTemporaria,
+          ja_existia: true,
+        });
+      }
+    }
     return NextResponse.json(
-      { message: inviteErr?.message ?? "Falha ao gerar convite." },
+      { message: createErr?.message ?? "Falha ao cadastrar usuário." },
       { status: 500 },
     );
   }
@@ -92,21 +180,15 @@ export async function POST(request: NextRequest) {
       papel: input.papel,
       telefone: input.telefone ?? null,
       empresa_id: profile.empresa_id,
+      ativo: true,
     })
-    .eq("id", invite.user.id);
-
-  // Gera magic link para acesso imediato.
-  const { data: magicLink } = await admin.auth.admin.generateLink({
-    type: "magiclink",
-    email: input.email,
-    options: { redirectTo: `${appUrl}/login` },
-  });
+    .eq("id", created.user.id);
 
   await logAudit({
     modulo: "vendedores",
-    acao: "invite",
+    acao: "create",
     entidade: "profiles",
-    entidadeId: invite.user.id,
+    entidadeId: created.user.id,
     dadosDepois: {
       email: input.email,
       papel: input.papel,
@@ -115,8 +197,9 @@ export async function POST(request: NextRequest) {
   });
 
   return NextResponse.json({
-    usuario_id: invite.user.id,
-    link: magicLink?.properties?.action_link ?? null,
-    senha_temporaria: null,
+    usuario_id: created.user.id,
+    email: input.email,
+    senha_temporaria: senhaTemporaria,
+    ja_existia: false,
   });
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,6 +31,12 @@ interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   tipoInicial: "entrada" | "saida";
+  /**
+   * Quando true, o tipo é travado em `tipoInicial` e o toggle Receita/Despesa
+   * fica oculto. Default true — uso típico vem de /entradas ou /saidas onde
+   * o tipo é dado pelo contexto.
+   */
+  lockTipo?: boolean;
 }
 
 interface FormState {
@@ -58,10 +65,23 @@ function emptyState(tipoInicial: "entrada" | "saida"): FormState {
   };
 }
 
-export function LancamentoDialog({ open, onOpenChange, tipoInicial }: Props) {
+export function LancamentoDialog({
+  open,
+  onOpenChange,
+  tipoInicial,
+  lockTipo = true,
+}: Props) {
   const [form, setForm] = useState<FormState>(emptyState(tipoInicial));
   const categorias = useCategoriasFinanceiras(form.tipo);
   const criar = useCriarLancamento();
+
+  // Quando o dialog reabre, força tipoInicial para corresponder ao contexto
+  // de onde foi aberto (evita "vazar" o tipo entre /entradas e /saidas).
+  React.useEffect(() => {
+    if (open) {
+      setForm((cur) => ({ ...cur, tipo: tipoInicial }));
+    }
+  }, [open, tipoInicial]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -101,24 +121,30 @@ export function LancamentoDialog({ open, onOpenChange, tipoInicial }: Props) {
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={onSubmit} className="flex flex-col gap-md">
-          <div className="flex items-center gap-xs">
-            <Button
-              type="button"
-              size="sm"
-              variant={form.tipo === "entrada" ? "default" : "secondary"}
-              onClick={() => setForm({ ...form, tipo: "entrada", categoria_id: "" })}
-            >
-              Receita
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant={form.tipo === "saida" ? "default" : "secondary"}
-              onClick={() => setForm({ ...form, tipo: "saida", categoria_id: "" })}
-            >
-              Despesa
-            </Button>
-          </div>
+          {!lockTipo ? (
+            <div className="flex items-center gap-xs">
+              <Button
+                type="button"
+                size="sm"
+                variant={form.tipo === "entrada" ? "default" : "secondary"}
+                onClick={() =>
+                  setForm({ ...form, tipo: "entrada", categoria_id: "" })
+                }
+              >
+                Receita
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant={form.tipo === "saida" ? "default" : "secondary"}
+                onClick={() =>
+                  setForm({ ...form, tipo: "saida", categoria_id: "" })
+                }
+              >
+                Despesa
+              </Button>
+            </div>
+          ) : null}
           <div className="flex flex-col gap-xs">
             <Label htmlFor="descricao">Descrição</Label>
             <Input

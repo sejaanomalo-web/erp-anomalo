@@ -19,6 +19,7 @@ export interface ProducaoCard {
   venda: {
     id: string;
     numero: number;
+    vendedor: { nome: string } | null;
   } | null;
   responsavel: { nome: string } | null;
   produto_descricao: string | null;
@@ -34,7 +35,7 @@ export function useProducoes() {
       const { data, error } = await supabase
         .from("producoes")
         .select(
-          "id, status, prioridade, data_fim_prevista, observacoes, venda:vendas(id, numero), responsavel:profiles!responsavel_id(nome), venda_item:venda_itens(produto_descricao, foto_modelo_url, foto_tecido_url)",
+          "id, status, prioridade, data_fim_prevista, observacoes, venda:vendas(id, numero, vendedor:profiles!vendedor_id(nome)), responsavel:profiles!responsavel_id(nome), venda_item:venda_itens(produto_descricao, foto_modelo_url, foto_tecido_url)",
         )
         .order("prioridade", { ascending: false })
         .order("data_fim_prevista", { ascending: true })
@@ -48,7 +49,11 @@ export function useProducoes() {
           prioridade: number;
           data_fim_prevista: string | null;
           observacoes: string | null;
-          venda: { id: string; numero: number } | null;
+          venda: {
+            id: string;
+            numero: number;
+            vendedor: { nome: string } | null;
+          } | null;
           responsavel: { nome: string } | null;
           venda_item: {
             produto_descricao: string | null;

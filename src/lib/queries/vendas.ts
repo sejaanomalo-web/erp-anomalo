@@ -218,6 +218,25 @@ export function useAtualizarVenda(id: string) {
   });
 }
 
+export function useExcluirVenda() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/vendas/${id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.message ?? "Falha ao excluir venda.");
+      }
+      return id;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.vendas() });
+      qc.invalidateQueries({ queryKey: queryKeys.producoes() });
+      qc.invalidateQueries({ queryKey: queryKeys.dashboard() });
+    },
+  });
+}
+
 export function useConverterOrcamento() {
   const qc = useQueryClient();
   return useMutation({

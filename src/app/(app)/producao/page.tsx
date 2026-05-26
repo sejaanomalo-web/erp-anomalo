@@ -12,7 +12,7 @@ import { toast } from "@/components/feedback/Toast";
 import { PRODUCAO_KANBAN_COLUMNS } from "@/lib/constants";
 import { formatDate } from "@/lib/utils";
 import { useMoverProducao, useProducoes } from "@/lib/queries/producoes";
-import { Hammer, Image as ImageIcon } from "lucide-react";
+import { Hammer, Image as ImageIcon, User } from "lucide-react";
 import type { ProducaoStatus } from "@/types/database.types";
 
 interface CardItem {
@@ -20,6 +20,7 @@ interface CardItem {
   status: ProducaoStatus;
   vendaNumero: number;
   produto: string;
+  vendedor: string;
   responsavel: string;
   prazo: string | null;
   fotoModelo: string | null;
@@ -35,6 +36,7 @@ export default function ProducaoPage() {
     status: p.status,
     vendaNumero: p.venda?.numero ?? 0,
     produto: p.produto_descricao ?? "Produto sem descrição",
+    vendedor: p.venda?.vendedor?.nome ?? "Sem vendedor",
     responsavel: p.responsavel?.nome ?? "Sem responsável",
     prazo: p.data_fim_prevista,
     fotoModelo: p.foto_modelo_url,
@@ -48,7 +50,7 @@ export default function ProducaoPage() {
       <Hero
         eyebrow="Fábrica"
         titulo="Produção"
-        descricao="Quadro arrastável. Esta tela exibe apenas dados do produto, sem informações pessoais."
+        descricao="Quadro arrastável. Exibe produto, vendedor responsável e prazo — sem dados pessoais do cliente."
       />
       {producoes.isLoading ? (
         <LoadingState linhas={4} />
@@ -72,11 +74,19 @@ export default function ProducaoPage() {
                 <span className="text-label-caps text-text-3">
                   Ref. #{item.vendaNumero}
                 </span>
-                <Badge tone="muted">{item.responsavel}</Badge>
+                <Badge tone="accent">
+                  <User size={10} strokeWidth={2} className="-mr-0.5" />
+                  {item.vendedor}
+                </Badge>
               </div>
               <span className="text-body-md text-text-1 line-clamp-3">
                 {item.produto}
               </span>
+              {item.responsavel !== "Sem responsável" ? (
+                <span className="text-caption text-text-4">
+                  Equipe: {item.responsavel}
+                </span>
+              ) : null}
               {(item.fotoModelo || item.fotoTecido) && (
                 <div className="grid grid-cols-2 gap-xs">
                   {item.fotoModelo && (
@@ -84,7 +94,7 @@ export default function ProducaoPage() {
                     <img
                       src={item.fotoModelo}
                       alt="Modelo"
-                      className="w-full aspect-square object-cover border border-border-thin"
+                      className="w-full aspect-square object-cover border border-border-thin rounded-md"
                     />
                   )}
                   {item.fotoTecido && (
@@ -92,11 +102,11 @@ export default function ProducaoPage() {
                     <img
                       src={item.fotoTecido}
                       alt="Tecido"
-                      className="w-full aspect-square object-cover border border-border-thin"
+                      className="w-full aspect-square object-cover border border-border-thin rounded-md"
                     />
                   )}
                   {!item.fotoModelo || !item.fotoTecido ? (
-                    <div className="w-full aspect-square border border-dashed border-border-thin flex items-center justify-center text-text-4">
+                    <div className="w-full aspect-square border border-dashed border-border-thin flex items-center justify-center text-text-4 rounded-md">
                       <ImageIcon size={16} strokeWidth={1.4} />
                     </div>
                   ) : null}

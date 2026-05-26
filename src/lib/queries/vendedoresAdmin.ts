@@ -156,8 +156,9 @@ export function useConvidarVendedor() {
       }
       return (await res.json()) as {
         usuario_id: string;
-        link: string | null;
-        senha_temporaria: string | null;
+        email: string;
+        senha_temporaria: string;
+        ja_existia: boolean;
       };
     },
     onSuccess: () => {

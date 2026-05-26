@@ -21,8 +21,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { PhotoUpload } from "@/components/forms/PhotoUpload";
 import { LoadingState } from "@/components/feedback/LoadingState";
 import { toast } from "@/components/feedback/Toast";
-import { useAtualizarVenda, useVenda } from "@/lib/queries/vendas";
+import { useAtualizarVenda, useExcluirVenda, useVenda } from "@/lib/queries/vendas";
 import { useVendedores } from "@/lib/queries/profiles";
+import { ConfirmDialog } from "@/components/feedback/ConfirmDialog";
 import { FORMAS_PAGAMENTO } from "@/lib/constants";
 import { formatCurrency } from "@/lib/utils";
 import type { VendaTipo } from "@/types/database.types";
@@ -60,7 +61,9 @@ export default function VendaEditarPage({
   const venda = useVenda(id);
   const vendedores = useVendedores();
   const atualizar = useAtualizarVenda(id);
+  const excluir = useExcluirVenda();
   const [form, setForm] = useState<VendaEditForm | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
     if (!venda.data || form) return;
@@ -476,18 +479,52 @@ export default function VendaEditarPage({
         ))}
       </div>
 
-      <div className="flex items-center justify-end gap-sm sticky bottom-md pt-md">
+      <div className="flex items-center justify-between gap-sm sticky bottom-md pt-md flex-wrap">
         <Button
-          variant="secondary"
-          onClick={() => router.push(`/vendas/${id}`)}
-          disabled={atualizar.isPending}
+          variant="destructive"
+          onClick={() => setConfirmDelete(true)}
+          disabled={atualizar.isPending || excluir.isPending}
         >
-          Cancelar
+          <Trash2 size={14} strokeWidth={1.8} />
+          Excluir venda
         </Button>
-        <Button onClick={salvar} disabled={atualizar.isPending}>
-          {atualizar.isPending ? "Salvando…" : "Salvar alterações"}
-        </Button>
+        <div className="flex items-center gap-sm flex-wrap">
+          <Button
+            variant="secondary"
+            onClick={() => router.push(`/vendas/${id}`)}
+            disabled={atualizar.isPending || excluir.isPending}
+          >
+            Cancelar
+          </Button>
+          <Button
+            onClick={salvar}
+            disabled={atualizar.isPending || excluir.isPending}
+          >
+            {atualizar.isPending ? "Salvando…" : "Salvar alterações"}
+          </Button>
+        </div>
       </div>
+
+      <ConfirmDialog
+        open={confirmDelete}
+        onOpenChange={setConfirmDelete}
+        titulo={`Excluir venda #${venda.data.numero}?`}
+        descricao="A venda, seus itens, produção vinculada e o lançamento de comissão serão removidos. Não dá para desfazer."
+        variant="destructive"
+        textoConfirmar="Excluir definitivamente"
+        palavraConfirmacao="EXCLUIR"
+        onConfirm={async () => {
+          try {
+            await excluir.mutateAsync(id);
+            toast.success("Venda excluída.");
+            router.push("/vendas");
+          } catch (err) {
+            toast.error(
+              err instanceof Error ? err.message : "Falha ao excluir venda.",
+            );
+          }
+        }}
+      />
     </div>
   );
 }
