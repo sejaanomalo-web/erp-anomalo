@@ -2,7 +2,15 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Plus, Boxes, ArrowDown, ArrowUp, Pencil, History } from "lucide-react";
+import {
+  Plus,
+  Boxes,
+  ArrowDown,
+  ArrowUp,
+  Pencil,
+  History,
+  Trash2,
+} from "lucide-react";
 import { Hero } from "@/components/sections/Hero";
 import { KPICard } from "@/components/sections/KPICard";
 import { Button } from "@/components/ui/button";
@@ -32,8 +40,10 @@ import {
   useMateriais,
   useSalvarMaterial,
   useMovimentarMaterial,
+  useExcluirMaterial,
   type MaterialRow,
 } from "@/lib/queries/materiais";
+import { ConfirmDialog } from "@/components/feedback/ConfirmDialog";
 
 const UNIDADES = ["m", "m²", "m³", "kg", "un", "rolo", "par"];
 
@@ -76,10 +86,12 @@ export default function MateriaisPage() {
   const materiais = useMateriais();
   const salvar = useSalvarMaterial();
   const movimentar = useMovimentarMaterial();
+  const excluir = useExcluirMaterial();
   const [formOpen, setFormOpen] = useState(false);
   const [form, setForm] = useState<NovoMaterial>(emptyMaterial);
   const [movOpen, setMovOpen] = useState(false);
   const [mov, setMov] = useState<NovoMovimento>(emptyMovimento);
+  const [excluirAlvo, setExcluirAlvo] = useState<MaterialRow | null>(null);
 
   const totalCritico = useMemo(
     () =>
@@ -146,26 +158,39 @@ export default function MateriaisPage() {
       key: "acoes",
       label: "",
       render: (m) => (
-        <Button
-          variant="ghost"
-          size="iconSm"
-          aria-label="Editar"
-          onClick={(e) => {
-            e.stopPropagation();
-            setForm({
-              id: m.id,
-              nome: m.nome,
-              unidade: m.unidade,
-              categoria: m.categoria ?? "",
-              estoque_minimo: Number(m.estoque_minimo),
-              estoque_atual: Number(m.estoque_atual),
-              custo_medio: Number(m.custo_medio ?? 0),
-            });
-            setFormOpen(true);
-          }}
-        >
-          <Pencil size={14} strokeWidth={1.8} />
-        </Button>
+        <div className="flex items-center gap-1 justify-end">
+          <Button
+            variant="ghost"
+            size="iconSm"
+            aria-label="Editar"
+            onClick={(e) => {
+              e.stopPropagation();
+              setForm({
+                id: m.id,
+                nome: m.nome,
+                unidade: m.unidade,
+                categoria: m.categoria ?? "",
+                estoque_minimo: Number(m.estoque_minimo),
+                estoque_atual: Number(m.estoque_atual),
+                custo_medio: Number(m.custo_medio ?? 0),
+              });
+              setFormOpen(true);
+            }}
+          >
+            <Pencil size={14} strokeWidth={1.8} />
+          </Button>
+          <Button
+            variant="ghost"
+            size="iconSm"
+            aria-label="Excluir"
+            onClick={(e) => {
+              e.stopPropagation();
+              setExcluirAlvo(m);
+            }}
+          >
+            <Trash2 size={14} strokeWidth={1.8} className="text-error" />
+          </Button>
+        </div>
       ),
       hideOnMobile: true,
     },
@@ -501,6 +526,28 @@ export default function MateriaisPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={Boolean(excluirAlvo)}
+        onOpenChange={(o) => !o && setExcluirAlvo(null)}
+        titulo={excluirAlvo ? `Excluir ${excluirAlvo.nome}?` : "Excluir"}
+        descricao="Remove o material e todo o histórico de movimentações. Não dá para desfazer."
+        variant="destructive"
+        textoConfirmar="Excluir definitivamente"
+        palavraConfirmacao="EXCLUIR"
+        onConfirm={async () => {
+          if (!excluirAlvo) return;
+          try {
+            await excluir.mutateAsync(excluirAlvo.id);
+            toast.success("Material excluído.");
+            setExcluirAlvo(null);
+          } catch (err) {
+            toast.error(
+              err instanceof Error ? err.message : "Falha ao excluir.",
+            );
+          }
+        }}
+      />
     </div>
   );
 }

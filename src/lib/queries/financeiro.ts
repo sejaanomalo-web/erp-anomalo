@@ -20,6 +20,7 @@ export interface LancamentoRow {
   categoria: { nome: string } | null;
   venda_id: string | null;
   observacoes: string | null;
+  origem: string | null;
   created_at: string;
 }
 
@@ -40,7 +41,7 @@ export function useLancamentos(filtros: LancamentosFiltros) {
       let q = supabase
         .from("lancamentos_financeiros")
         .select(
-          "id, tipo, descricao, valor, data_competencia, data_vencimento, data_pagamento, status, forma_pagamento, categoria_id, categoria:categorias_financeiras(nome), venda_id, observacoes, created_at",
+          "id, tipo, descricao, valor, data_competencia, data_vencimento, data_pagamento, status, forma_pagamento, categoria_id, categoria:categorias_financeiras(nome), venda_id, observacoes, origem, created_at",
         )
         .gte("data_competencia", filtros.inicio)
         .lte("data_competencia", filtros.fim)
@@ -95,6 +96,7 @@ export interface LancamentoInput {
   forma_pagamento?: string | null;
   categoria_id?: string | null;
   observacoes?: string | null;
+  origem?: string | null;
 }
 
 export function useCriarLancamento() {
@@ -109,7 +111,16 @@ export function useCriarLancamento() {
         .insert({
           empresa_id: perfil.empresa_id,
           responsavel_id: perfil.id,
-          ...input,
+          tipo: input.tipo,
+          descricao: input.descricao,
+          valor: input.valor,
+          data_competencia: input.data_competencia,
+          data_vencimento: input.data_vencimento ?? null,
+          status: input.status,
+          forma_pagamento: input.forma_pagamento ?? null,
+          categoria_id: input.categoria_id ?? null,
+          observacoes: input.observacoes ?? null,
+          origem: input.origem ?? null,
         })
         .select("id")
         .single();
@@ -166,6 +177,45 @@ export function useCriarCategoriaFinanceira() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["categorias-financeiras"] });
+    },
+  });
+}
+
+export function useAtualizarLancamento() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { id: string } & Partial<LancamentoInput>) => {
+      const supabase = createClient();
+      const { id, ...patch } = input;
+      const { error } = await supabase
+        .from("lancamentos_financeiros")
+        .update(patch)
+        .eq("id", id);
+      if (error) throw error;
+      return id;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["financeiro"] });
+      qc.invalidateQueries({ queryKey: queryKeys.dashboard() });
+    },
+  });
+}
+
+export function useExcluirLancamento() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("lancamentos_financeiros")
+        .delete()
+        .eq("id", id);
+      if (error) throw error;
+      return id;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["financeiro"] });
+      qc.invalidateQueries({ queryKey: queryKeys.dashboard() });
     },
   });
 }

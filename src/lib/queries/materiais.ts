@@ -86,6 +86,24 @@ export function useSalvarMaterial() {
   });
 }
 
+export function useExcluirMaterial() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const supabase = createClient();
+      // Limpa movimentações vinculadas primeiro (RLS permite ao gestor/admin/producao)
+      await supabase.from("estoque_movimentacoes").delete().eq("material_id", id);
+      const { error } = await supabase.from("materiais").delete().eq("id", id);
+      if (error) throw error;
+      return id;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.materiais() });
+      qc.invalidateQueries({ queryKey: queryKeys.estoque() });
+    },
+  });
+}
+
 export interface MovimentacaoRow {
   id: string;
   created_at: string;

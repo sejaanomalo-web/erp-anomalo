@@ -167,6 +167,60 @@ export function useConvidarVendedor() {
   });
 }
 
+export function useAtualizarVendedorPerfil() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      id: string;
+      nome?: string;
+      telefone?: string | null;
+      cargo?: string | null;
+      papel?: Papel;
+      ativo?: boolean;
+    }) => {
+      const supabase = createClient();
+      const { id, ...patch } = input;
+      const payload: Record<string, unknown> = {};
+      if (patch.nome !== undefined) payload.nome = patch.nome.trim();
+      if (patch.telefone !== undefined)
+        payload.telefone = patch.telefone?.trim() || null;
+      if (patch.cargo !== undefined)
+        payload.cargo = patch.cargo?.trim() || null;
+      if (patch.papel !== undefined) payload.papel = patch.papel;
+      if (patch.ativo !== undefined) payload.ativo = patch.ativo;
+
+      const { error } = await supabase
+        .from("profiles")
+        .update(payload)
+        .eq("id", id);
+      if (error) throw error;
+      return id;
+    },
+    onSuccess: (id) => {
+      qc.invalidateQueries({ queryKey: queryKeys.vendedores() });
+      qc.invalidateQueries({ queryKey: ["vendedores", "detail", id] });
+    },
+  });
+}
+
+export function useDesativarVendedor() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("profiles")
+        .update({ ativo: false })
+        .eq("id", id);
+      if (error) throw error;
+      return id;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.vendedores() });
+    },
+  });
+}
+
 export function useAtualizarPermissoes() {
   const qc = useQueryClient();
   return useMutation({

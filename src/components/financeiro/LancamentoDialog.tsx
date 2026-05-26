@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -23,7 +23,11 @@ import {
 import { CategoriaCombobox } from "@/components/financeiro/CategoriaCombobox";
 import { toast } from "@/components/feedback/Toast";
 import { FORMAS_PAGAMENTO } from "@/lib/constants";
-import { useCriarLancamento } from "@/lib/queries/financeiro";
+import {
+  useAtualizarLancamento,
+  useCriarLancamento,
+  type LancamentoRow,
+} from "@/lib/queries/financeiro";
 
 interface Props {
   open: boolean;
@@ -31,15 +35,20 @@ interface Props {
   tipoInicial: "entrada" | "saida";
   /**
    * Quando true, o tipo é travado em `tipoInicial` e o toggle Receita/Despesa
-   * fica oculto. Default true — uso típico vem de /entradas ou /saidas onde
-   * o tipo é dado pelo contexto.
+   * fica oculto. Default true.
    */
   lockTipo?: boolean;
+  /**
+   * Quando fornecido, o dialog entra em modo edição: pré-preenche os campos
+   * e chama PATCH em vez de POST.
+   */
+  editar?: LancamentoRow | null;
 }
 
 interface FormState {
   tipo: "entrada" | "saida";
   descricao: string;
+  origem: string;
   valor: number;
   data_competencia: string;
   data_vencimento: string;
@@ -53,6 +62,7 @@ function emptyState(tipoInicial: "entrada" | "saida"): FormState {
   return {
     tipo: tipoInicial,
     descricao: "",
+    origem: "",
     valor: 0,
     data_competencia: new Date().toISOString().slice(0, 10),
     data_vencimento: "",
@@ -63,30 +73,54 @@ function emptyState(tipoInicial: "entrada" | "saida"): FormState {
   };
 }
 
+function fromRow(row: LancamentoRow): FormState {
+  return {
+    tipo: row.tipo,
+    descricao: row.descricao ?? "",
+    origem: row.origem ?? "",
+    valor: Number(row.valor ?? 0),
+    data_competencia: row.data_competencia,
+    data_vencimento: row.data_vencimento ?? "",
+    forma_pagamento: row.forma_pagamento ?? "pix",
+    categoria_id: row.categoria_id ?? "",
+    status: (row.status === "pago" ? "pago" : "pendente") as
+      | "pendente"
+      | "pago",
+    observacoes: row.observacoes ?? "",
+  };
+}
+
 export function LancamentoDialog({
   open,
   onOpenChange,
   tipoInicial,
   lockTipo = true,
+  editar,
 }: Props) {
   const [form, setForm] = useState<FormState>(emptyState(tipoInicial));
   const criar = useCriarLancamento();
+  const atualizar = useAtualizarLancamento();
+  const isEdit = Boolean(editar);
+  const pending = criar.isPending || atualizar.isPending;
 
-  // Quando o dialog reabre, força tipoInicial para corresponder ao contexto
-  // de onde foi aberto (evita "vazar" o tipo entre /entradas e /saidas).
-  React.useEffect(() => {
+  useEffect(() => {
     if (open) {
-      setForm((cur) => ({ ...cur, tipo: tipoInicial }));
+      if (editar) {
+        setForm(fromRow(editar));
+      } else {
+        setForm((cur) => ({ ...emptyState(tipoInicial), tipo: tipoInicial }));
+      }
     }
-  }, [open, tipoInicial]);
+  }, [open, tipoInicial, editar]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (form.descricao.trim().length < 2 || form.valor <= 0) return;
     try {
-      await criar.mutateAsync({
+      const payload = {
         tipo: form.tipo,
         descricao: form.descricao.trim(),
+        origem: form.origem.trim() || null,
         valor: form.valor,
         data_competencia: form.data_competencia,
         data_vencimento: form.data_vencimento || null,
@@ -94,12 +128,20 @@ export function LancamentoDialog({
         categoria_id: form.categoria_id || null,
         status: form.status,
         observacoes: form.observacoes.trim() || null,
-      });
-      toast.success(
-        form.tipo === "entrada"
-          ? "Receita registrada."
-          : "Despesa registrada.",
-      );
+      };
+
+      if (isEdit && editar) {
+        await atualizar.mutateAsync({ id: editar.id, ...payload });
+        toast.success("Lançamento atualizado.");
+      } else {
+        await criar.mutateAsync(payload);
+        toast.success(
+          form.tipo === "entrada"
+            ? "Receita registrada."
+            : "Despesa registrada.",
+        );
+      }
+
       setForm(emptyState(tipoInicial));
       onOpenChange(false);
     } catch (err) {
@@ -109,16 +151,22 @@ export function LancamentoDialog({
     }
   }
 
+  const title = isEdit
+    ? form.tipo === "entrada"
+      ? "Editar receita"
+      : "Editar despesa"
+    : form.tipo === "entrada"
+      ? "Nova receita"
+      : "Nova despesa";
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>
-            {form.tipo === "entrada" ? "Nova receita" : "Nova despesa"}
-          </DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         <form onSubmit={onSubmit} className="flex flex-col gap-md">
-          {!lockTipo ? (
+          {!lockTipo && !isEdit ? (
             <div className="flex items-center gap-xs">
               <Button
                 type="button"
@@ -142,17 +190,34 @@ export function LancamentoDialog({
               </Button>
             </div>
           ) : null}
-          <div className="flex flex-col gap-xs">
-            <Label htmlFor="descricao">Descrição</Label>
-            <Input
-              id="descricao"
-              value={form.descricao}
-              onChange={(e) =>
-                setForm({ ...form, descricao: e.target.value })
-              }
-              required
-              placeholder="Ex: Venda 1234, Aluguel, Fornecedor X"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+            <div className="flex flex-col gap-xs">
+              <Label htmlFor="descricao">Descrição</Label>
+              <Input
+                id="descricao"
+                value={form.descricao}
+                onChange={(e) =>
+                  setForm({ ...form, descricao: e.target.value })
+                }
+                required
+                placeholder="Ex: Venda 1234, Aluguel"
+              />
+            </div>
+            <div className="flex flex-col gap-xs">
+              <Label htmlFor="origem">Origem</Label>
+              <Input
+                id="origem"
+                value={form.origem}
+                onChange={(e) =>
+                  setForm({ ...form, origem: e.target.value })
+                }
+                placeholder={
+                  form.tipo === "entrada"
+                    ? "Cliente, venda balcão, indicação…"
+                    : "Fornecedor, comissão, prestador…"
+                }
+              />
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-md">
             <div className="flex flex-col gap-xs">
@@ -262,8 +327,8 @@ export function LancamentoDialog({
             >
               Cancelar
             </Button>
-            <Button type="submit" disabled={criar.isPending}>
-              {criar.isPending ? "Salvando…" : "Salvar"}
+            <Button type="submit" disabled={pending}>
+              {pending ? "Salvando…" : isEdit ? "Salvar alterações" : "Salvar"}
             </Button>
           </DialogFooter>
         </form>

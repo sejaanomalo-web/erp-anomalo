@@ -1,20 +1,52 @@
 "use client";
 
-import { use, useMemo } from "react";
+import { use, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Pencil, UserMinus, UserCog } from "lucide-react";
 import { Hero } from "@/components/sections/Hero";
 import { KPICard } from "@/components/sections/KPICard";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { LoadingState } from "@/components/feedback/LoadingState";
 import { EmptyState } from "@/components/feedback/EmptyState";
-import { UserCog } from "lucide-react";
+import { ConfirmDialog } from "@/components/feedback/ConfirmDialog";
+import { toast } from "@/components/feedback/Toast";
 import { DataTable, type DataTableColumn } from "@/components/tables/DataTable";
-import { useVendedor } from "@/lib/queries/vendedoresAdmin";
+import {
+  useAtualizarVendedorPerfil,
+  useDesativarVendedor,
+  useVendedor,
+} from "@/lib/queries/vendedoresAdmin";
 import { initials, formatCurrency, formatDate } from "@/lib/utils";
 import { VENDA_TIPO_LABEL, VENDA_TIPO_TONE } from "@/lib/constants";
+import type { Papel } from "@/types/database.types";
+
+const PAPEL_LABEL: Record<Papel, string> = {
+  admin: "Admin",
+  gestor: "Gestor",
+  financeiro: "Financeiro",
+  vendedor: "Vendedor",
+  producao: "Produção",
+};
 
 interface AgrupadoProduto {
   produto: string;
@@ -29,7 +61,30 @@ export default function VendedorDetalhePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
+  const router = useRouter();
   const { data, isLoading, error } = useVendedor(id);
+  const atualizar = useAtualizarVendedorPerfil();
+  const desativar = useDesativarVendedor();
+
+  const [editOpen, setEditOpen] = useState(false);
+  const [confirmDeactivate, setConfirmDeactivate] = useState(false);
+  const [form, setForm] = useState({
+    nome: "",
+    telefone: "",
+    cargo: "",
+    papel: "vendedor" as Papel,
+  });
+
+  useEffect(() => {
+    if (data?.perfil) {
+      setForm({
+        nome: data.perfil.nome ?? "",
+        telefone: data.perfil.telefone ?? "",
+        cargo: data.perfil.cargo ?? "",
+        papel: data.perfil.papel,
+      });
+    }
+  }, [data?.perfil]);
 
   const porProduto: AgrupadoProduto[] = useMemo(() => {
     if (!data) return [];
@@ -155,17 +210,60 @@ export default function VendedorDetalhePage({
         Voltar à equipe
       </Link>
 
-      <div className="flex items-center gap-md">
+      <div className="flex items-start gap-md">
         <Avatar className="h-16 w-16">
           <AvatarFallback className="text-h4">
             {initials(data.perfil.nome)}
           </AvatarFallback>
         </Avatar>
-        <Hero
-          eyebrow={data.perfil.papel}
-          titulo={data.perfil.nome}
-          descricao={data.perfil.email}
-        />
+        <div className="flex-1">
+          <Hero
+            eyebrow={PAPEL_LABEL[data.perfil.papel]}
+            titulo={data.perfil.nome}
+            descricao={data.perfil.email}
+            acoes={
+              <div className="flex items-center gap-sm">
+                <Button variant="secondary" onClick={() => setEditOpen(true)}>
+                  <Pencil size={14} strokeWidth={1.8} />
+                  Editar
+                </Button>
+                {data.perfil.ativo ? (
+                  <Button
+                    variant="destructive"
+                    onClick={() => setConfirmDeactivate(true)}
+                  >
+                    <UserMinus size={14} strokeWidth={1.8} />
+                    Desativar
+                  </Button>
+                ) : (
+                  <Button
+                    variant="secondary"
+                    onClick={async () => {
+                      try {
+                        await atualizar.mutateAsync({ id, ativo: true });
+                        toast.success("Vendedor reativado.");
+                      } catch (err) {
+                        toast.error(
+                          err instanceof Error
+                            ? err.message
+                            : "Falha ao reativar.",
+                        );
+                      }
+                    }}
+                    disabled={atualizar.isPending}
+                  >
+                    Reativar
+                  </Button>
+                )}
+              </div>
+            }
+          />
+          {!data.perfil.ativo ? (
+            <div className="mt-xs">
+              <Badge tone="muted">Inativo</Badge>
+            </div>
+          ) : null}
+        </div>
       </div>
 
       <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-md">
@@ -221,6 +319,127 @@ export default function VendedorDetalhePage({
           />
         )}
       </section>
+
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar vendedor</DialogTitle>
+          </DialogHeader>
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              if (form.nome.trim().length < 2) {
+                toast.error("Nome obrigatório.");
+                return;
+              }
+              try {
+                await atualizar.mutateAsync({
+                  id,
+                  nome: form.nome,
+                  telefone: form.telefone,
+                  cargo: form.cargo,
+                  papel: form.papel,
+                });
+                toast.success("Vendedor atualizado.");
+                setEditOpen(false);
+              } catch (err) {
+                toast.error(
+                  err instanceof Error ? err.message : "Falha ao salvar.",
+                );
+              }
+            }}
+            className="flex flex-col gap-md"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+              <div className="flex flex-col gap-xs">
+                <Label htmlFor="vend_nome">Nome</Label>
+                <Input
+                  id="vend_nome"
+                  value={form.nome}
+                  onChange={(e) =>
+                    setForm({ ...form, nome: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className="flex flex-col gap-xs">
+                <Label htmlFor="vend_tel">Telefone</Label>
+                <Input
+                  id="vend_tel"
+                  value={form.telefone}
+                  onChange={(e) =>
+                    setForm({ ...form, telefone: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+              <div className="flex flex-col gap-xs">
+                <Label htmlFor="vend_cargo">Cargo</Label>
+                <Input
+                  id="vend_cargo"
+                  value={form.cargo}
+                  onChange={(e) =>
+                    setForm({ ...form, cargo: e.target.value })
+                  }
+                  placeholder="Ex: Vendedor sênior"
+                />
+              </div>
+              <div className="flex flex-col gap-xs">
+                <Label>Papel</Label>
+                <Select
+                  value={form.papel}
+                  onValueChange={(v) => setForm({ ...form, papel: v as Papel })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="vendedor">Vendedor</SelectItem>
+                    <SelectItem value="producao">Produção</SelectItem>
+                    <SelectItem value="financeiro">Financeiro</SelectItem>
+                    <SelectItem value="gestor">Gestor</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setEditOpen(false)}
+              >
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={atualizar.isPending}>
+                {atualizar.isPending ? "Salvando…" : "Salvar"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <ConfirmDialog
+        open={confirmDeactivate}
+        onOpenChange={setConfirmDeactivate}
+        titulo={`Desativar ${data.perfil.nome}?`}
+        descricao="O usuário fica sem acesso ao sistema mas o histórico de vendas/lançamentos é preservado. Você pode reativar depois."
+        variant="destructive"
+        textoConfirmar="Desativar"
+        onConfirm={async () => {
+          try {
+            await desativar.mutateAsync(id);
+            toast.success("Vendedor desativado.");
+            setConfirmDeactivate(false);
+            router.push("/vendedores");
+          } catch (err) {
+            toast.error(
+              err instanceof Error ? err.message : "Falha ao desativar.",
+            );
+          }
+        }}
+      />
     </div>
   );
 }

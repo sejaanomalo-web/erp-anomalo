@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
 import { queryKeys } from "./keys";
 
@@ -71,6 +71,62 @@ export function useCliente(id: string) {
         .single();
       if (error) throw error;
       return data as ClienteRow;
+    },
+  });
+}
+
+export interface ClienteInput {
+  nome: string;
+  telefone?: string | null;
+  email?: string | null;
+  cpf_cnpj?: string | null;
+  origem?: string | null;
+  observacoes?: string | null;
+}
+
+export function useAtualizarCliente(id: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: ClienteInput) => {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("clientes")
+        .update({
+          nome: input.nome.trim(),
+          telefone: input.telefone?.trim() || null,
+          email: input.email?.trim() || null,
+          cpf_cnpj: input.cpf_cnpj?.trim() || null,
+          origem: input.origem?.trim() || null,
+          observacoes: input.observacoes?.trim() || null,
+        })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.cliente(id) });
+      qc.invalidateQueries({ queryKey: queryKeys.clientes() });
+    },
+  });
+}
+
+export function useExcluirCliente() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const supabase = createClient();
+      const { error } = await supabase.from("clientes").delete().eq("id", id);
+      if (error) {
+        if (error.code === "23503") {
+          throw new Error(
+            "Este cliente tem vendas vinculadas. Exclua as vendas primeiro ou mantenha o cliente para preservar o histórico.",
+          );
+        }
+        throw error;
+      }
+      return id;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.clientes() });
     },
   });
 }
