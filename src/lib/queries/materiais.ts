@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
 import { queryKeys } from "./keys";
+import { getPerfilAutenticado } from "@/lib/auth/perfil";
 
 export interface MaterialRow {
   id: string;
@@ -47,16 +48,10 @@ export function useSalvarMaterial() {
   return useMutation({
     mutationFn: async (input: MaterialInput) => {
       const supabase = createClient();
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("empresa_id")
-        .maybeSingle();
-      if (!profile?.empresa_id) {
-        throw new Error("Perfil sem empresa vinculada.");
-      }
+      const perfil = await getPerfilAutenticado(supabase);
 
       const payload = {
-        empresa_id: profile.empresa_id,
+        empresa_id: perfil.empresa_id,
         nome: input.nome.trim(),
         unidade: input.unidade.trim(),
         categoria: input.categoria?.trim() || null,
@@ -167,22 +162,16 @@ export function useMovimentarMaterial() {
       observacoes?: string | null;
     }) => {
       const supabase = createClient();
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("id, empresa_id")
-        .maybeSingle();
-      if (!profile?.empresa_id) {
-        throw new Error("Perfil sem empresa.");
-      }
+      const perfil = await getPerfilAutenticado(supabase);
 
       const { error } = await supabase.from("estoque_movimentacoes").insert({
-        empresa_id: profile.empresa_id,
+        empresa_id: perfil.empresa_id,
         tipo: input.tipo,
         origem: input.origem,
         material_id: input.material_id,
         quantidade: input.quantidade,
         valor_unitario: input.valor_unitario ?? null,
-        responsavel_id: profile.id,
+        responsavel_id: perfil.id,
         observacoes: input.observacoes ?? null,
       });
       if (error) throw error;

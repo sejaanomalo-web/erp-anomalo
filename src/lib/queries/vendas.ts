@@ -83,6 +83,7 @@ export interface VendaItemDetail {
 
 export interface VendaDetail extends VendaListRow {
   desconto: number;
+  taxa: number;
   forma_pagamento: string | null;
   parcelas: number;
   comissao_percentual: number | null;
@@ -121,9 +122,11 @@ export interface CriarVendaInput {
     cpf_cnpj?: string | null;
     endereco?: string | null;
   } | null;
+  vendedor_id?: string | null;
   tipo: VendaTipo;
   valor_total: number;
   desconto: number;
+  taxa: number;
   forma_pagamento: string | null;
   parcelas: number;
   data_venda: string;
@@ -165,6 +168,52 @@ export function useCriarVenda() {
       qc.invalidateQueries({ queryKey: queryKeys.producoes() });
       qc.invalidateQueries({ queryKey: queryKeys.dashboard() });
       qc.invalidateQueries({ queryKey: queryKeys.clientes() });
+    },
+  });
+}
+
+export interface AtualizarVendaInput {
+  vendedor_id?: string;
+  tipo?: VendaTipo;
+  desconto?: number;
+  taxa?: number;
+  forma_pagamento?: string | null;
+  parcelas?: number;
+  data_venda?: string;
+  data_prevista_entrega?: string;
+  data_prevista_producao?: string | null;
+  observacoes?: string | null;
+  itens?: {
+    id?: string;
+    produto_descricao: string;
+    quantidade: number;
+    valor_unitario: number;
+    observacoes?: string | null;
+    foto_modelo_url?: string | null;
+    foto_tecido_url?: string | null;
+  }[];
+}
+
+export function useAtualizarVenda(id: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: AtualizarVendaInput) => {
+      const res = await fetch(`/api/vendas/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.message ?? "Falha ao atualizar venda.");
+      }
+      return (await res.json()) as { ok: true; id: string };
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.venda(id) });
+      qc.invalidateQueries({ queryKey: queryKeys.vendas() });
+      qc.invalidateQueries({ queryKey: queryKeys.producoes() });
+      qc.invalidateQueries({ queryKey: queryKeys.dashboard() });
     },
   });
 }

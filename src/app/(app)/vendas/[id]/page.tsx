@@ -1,7 +1,7 @@
 "use client";
 
 import { use } from "react";
-import { ArrowLeft, Check } from "lucide-react";
+import { ArrowLeft, Check, Pencil } from "lucide-react";
 import Link from "next/link";
 import { Hero } from "@/components/sections/Hero";
 import { Card } from "@/components/ui/card";
@@ -79,6 +79,12 @@ export default function VendaDetalhePage({
                 {converter.isPending ? "Convertendo…" : "Fechar venda"}
               </Button>
             ) : null}
+            <Button variant="secondary" size="sm" asChild>
+              <Link href={`/vendas/${id}/editar`}>
+                <Pencil size={14} strokeWidth={1.8} />
+                Editar
+              </Link>
+            </Button>
           </div>
         }
       />

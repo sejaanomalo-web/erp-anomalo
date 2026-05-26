@@ -39,12 +39,43 @@ export async function POST(request: NextRequest) {
   }
   const input = parsed.data;
 
+  // Vendedor selecionado no formulário; default = autor da requisição.
+  let vendedorId = (input.vendedor_id ?? profile.id) as string;
+
+  // Permissão para escolher outro vendedor: só admin/gestor.
+  if (
+    input.vendedor_id &&
+    input.vendedor_id !== profile.id &&
+    !["admin", "gestor"].includes(profile.papel as string)
+  ) {
+    // Vendedor comum não pode atribuir venda para terceiro: força para si mesmo.
+    vendedorId = profile.id as string;
+  } else if (input.vendedor_id) {
+    // Confere se o vendedor escolhido pertence à mesma empresa.
+    const { data: vend } = await supabase
+      .from("profiles")
+      .select("id, empresa_id, papel, ativo")
+      .eq("id", input.vendedor_id)
+      .maybeSingle();
+    if (
+      !vend ||
+      vend.empresa_id !== profile.empresa_id ||
+      !["admin", "gestor", "vendedor"].includes(vend.papel as string) ||
+      !vend.ativo
+    ) {
+      return NextResponse.json(
+        { message: "Vendedor inválido." },
+        { status: 422 },
+      );
+    }
+    vendedorId = vend.id as string;
+  }
+
   // 0. Resolve cliente — se vier inline, cria/encontra primeiro.
   let clienteId = input.cliente_id ?? null;
   let clienteCriadoNovo = false;
 
   if (!clienteId && input.cliente_inline) {
-    // Tenta achar cliente por telefone (chave natural) antes de criar duplicado.
     const telefoneLimpo = input.cliente_inline.telefone.replace(/\D/g, "");
     if (telefoneLimpo.length >= 8) {
       const { data: existente } = await supabase
@@ -94,7 +125,7 @@ export async function POST(request: NextRequest) {
     (acc, i) => acc + i.quantidade * i.valor_unitario,
     0,
   );
-  const valorTotal = Math.max(0, valorItens - input.desconto);
+  const valorTotal = Math.max(0, valorItens - input.desconto - input.taxa);
   const comissaoPercentual = COMISSAO_DEFAULT_PERCENT;
   const comissaoValor = (valorTotal * comissaoPercentual) / 100;
   const isOrcamento = input.tipo === "orcamento";
@@ -105,11 +136,12 @@ export async function POST(request: NextRequest) {
     .insert({
       empresa_id: profile.empresa_id,
       cliente_id: clienteId,
-      vendedor_id: profile.id,
+      vendedor_id: vendedorId,
       tipo: input.tipo,
-      status: isOrcamento ? "aguardando_producao" : "aguardando_producao",
+      status: "aguardando_producao",
       valor_total: valorTotal,
       desconto: input.desconto,
+      taxa: input.taxa,
       forma_pagamento: input.forma_pagamento ?? null,
       parcelas: input.parcelas,
       comissao_percentual: isOrcamento ? null : comissaoPercentual,
@@ -129,7 +161,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // 3. Insert itens (texto livre + fotos + observacoes)
+  // 3. Insert itens
   const itensPayload = input.itens.map((item) => ({
     venda_id: venda.id,
     produto_descricao: item.produto_descricao.trim(),
@@ -147,7 +179,6 @@ export async function POST(request: NextRequest) {
     .select("id");
 
   if (itensError) {
-    // rollback simples
     await supabase.from("vendas").delete().eq("id", venda.id);
     if (clienteCriadoNovo) {
       await supabase.from("clientes").delete().eq("id", clienteId);
@@ -183,7 +214,7 @@ export async function POST(request: NextRequest) {
       status: "pendente",
       forma_pagamento: input.forma_pagamento ?? null,
       venda_id: venda.id,
-      vendedor_comissao_id: profile.id,
+      vendedor_comissao_id: vendedorId,
       responsavel_id: profile.id,
     });
   }
@@ -198,6 +229,7 @@ export async function POST(request: NextRequest) {
       numero: venda.numero,
       tipo: input.tipo,
       valor_total: valorTotal,
+      vendedor_id: vendedorId,
       cliente_inline: clienteCriadoNovo,
     },
   });

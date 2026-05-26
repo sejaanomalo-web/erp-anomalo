@@ -5,9 +5,12 @@ import {
   DndContext,
   DragOverlay,
   PointerSensor,
-  closestCorners,
+  pointerWithin,
+  rectIntersection,
+  useDroppable,
   useSensor,
   useSensors,
+  type CollisionDetection,
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
@@ -56,19 +59,18 @@ function SortableCard<S extends string, T extends KanbanItem<S>>({
         transition,
       }}
       className={cn(
-        "solid-surface p-md flex flex-col gap-sm group relative",
+        "solid-surface p-md flex flex-col gap-sm group relative cursor-grab active:cursor-grabbing",
         isDragging && "opacity-50",
       )}
+      {...attributes}
+      {...listeners}
     >
-      <button
-        type="button"
-        {...attributes}
-        {...listeners}
-        aria-label="Arrastar"
-        className="absolute right-sm top-sm text-text-4 opacity-0 group-hover:opacity-100 transition-opacity duration-fast focus-visible:opacity-100"
+      <span
+        aria-hidden
+        className="absolute right-sm top-sm text-text-4 opacity-0 group-hover:opacity-100 transition-opacity duration-fast pointer-events-none"
       >
         <GripVertical size={14} strokeWidth={1.8} />
-      </button>
+      </span>
       {renderCard(item)}
     </div>
   );
@@ -83,6 +85,11 @@ function ColumnContainer<S extends string, T extends KanbanItem<S>>({
   items: T[];
   renderCard: (item: T) => React.ReactNode;
 }) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: column.id,
+    data: { type: "column", columnId: column.id },
+  });
+
   return (
     <div className="flex flex-col gap-md min-w-[280px] w-[280px] shrink-0">
       <div className="sticky top-0 z-10 bg-background pb-xs">
@@ -98,10 +105,16 @@ function ColumnContainer<S extends string, T extends KanbanItem<S>>({
         items={items.map((i) => i.id)}
         strategy={verticalListSortingStrategy}
       >
-        <div className="flex flex-col gap-sm min-h-[120px]">
+        <div
+          ref={setNodeRef}
+          className={cn(
+            "flex flex-col gap-sm min-h-[200px] p-xs -mx-xs border border-dashed border-transparent transition-colors duration-fast",
+            isOver && "border-[var(--accent-strong)] bg-surface-1",
+          )}
+        >
           {items.length === 0 ? (
             <div className="border border-dashed border-border-thin p-md text-body-sm text-text-4 text-center">
-              Vazio
+              {isOver ? "Solte aqui" : "Vazio"}
             </div>
           ) : (
             items.map((item) => (
@@ -118,6 +131,33 @@ function ColumnContainer<S extends string, T extends KanbanItem<S>>({
   );
 }
 
+// Estratégia híbrida: pointerWithin pega coluna (drops em área vazia)
+// e cai para rectIntersection nos itens. Sem isso, drop em coluna vazia falha.
+function makeCollision<S extends string, T extends KanbanItem<S>>(
+  items: T[],
+  columns: KanbanColumn<S>[],
+): CollisionDetection {
+  return (args) => {
+    const pointer = pointerWithin(args);
+    if (pointer.length > 0) {
+      const colMatch = pointer.find((p) =>
+        columns.some((c) => c.id === p.id),
+      );
+      if (colMatch) return [colMatch];
+      return pointer;
+    }
+    const rect = rectIntersection(args);
+    if (rect.length > 0) return rect;
+    const activeId = String(args.active.id);
+    const activeItem = items.find((i) => i.id === activeId);
+    if (activeItem) {
+      const col = columns.find((c) => c.id === activeItem.status);
+      if (col) return [{ id: col.id }];
+    }
+    return [];
+  };
+}
+
 export function KanbanBoard<S extends string, T extends KanbanItem<S>>({
   columns,
   items,
@@ -126,7 +166,11 @@ export function KanbanBoard<S extends string, T extends KanbanItem<S>>({
 }: KanbanBoardProps<S, T>) {
   const [localItems, setLocalItems] = useState(items);
   const [activeId, setActiveId] = useState<string | null>(null);
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 6 },
+    }),
+  );
 
   useEffect(() => {
     setLocalItems(items);
@@ -143,6 +187,10 @@ export function KanbanBoard<S extends string, T extends KanbanItem<S>>({
   }, [columns, localItems]);
 
   const active = localItems.find((i) => i.id === activeId);
+  const collision = useMemo(
+    () => makeCollision(localItems, columns),
+    [localItems, columns],
+  );
 
   function handleDragStart(event: DragStartEvent) {
     setActiveId(String(event.active.id));
@@ -156,12 +204,13 @@ export function KanbanBoard<S extends string, T extends KanbanItem<S>>({
     const itemId = String(dragged.id);
     const overId = String(over.id);
 
-    // Quando over é um card, pegamos o status do card; quando é uma coluna, usamos o id da coluna.
+    let targetStatus: S | null = null;
     const overColumn = columns.find((c) => c.id === overId);
-    let targetStatus: S | null = overColumn?.id ?? null;
-    if (!targetStatus) {
+    if (overColumn) {
+      targetStatus = overColumn.id;
+    } else {
       const overItem = localItems.find((i) => i.id === overId);
-      targetStatus = overItem?.status ?? null;
+      if (overItem) targetStatus = overItem.status;
     }
     if (!targetStatus) return;
 
@@ -171,7 +220,9 @@ export function KanbanBoard<S extends string, T extends KanbanItem<S>>({
 
     const before = localItems;
     setLocalItems((current) =>
-      current.map((i) => (i.id === itemId ? { ...i, status: targetStatus! } : i)),
+      current.map((i) =>
+        i.id === itemId ? { ...i, status: targetStatus! } : i,
+      ),
     );
 
     Promise.resolve(onItemMove(itemId, targetStatus)).catch(() => {
@@ -182,9 +233,10 @@ export function KanbanBoard<S extends string, T extends KanbanItem<S>>({
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCorners}
+      collisionDetection={collision}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
+      onDragCancel={() => setActiveId(null)}
     >
       <div className="flex gap-lg overflow-x-auto scrollbar-thin pb-md -mx-md px-md">
         {columns.map((column) => (
@@ -201,7 +253,7 @@ export function KanbanBoard<S extends string, T extends KanbanItem<S>>({
           <motion.div
             initial={{ scale: 1.02 }}
             animate={{ scale: 1.04 }}
-            className="solid-surface p-md shadow-elevated"
+            className="solid-surface p-md shadow-elevated cursor-grabbing"
           >
             {renderCard(active)}
           </motion.div>

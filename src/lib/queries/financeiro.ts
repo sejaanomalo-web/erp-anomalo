@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
 import { queryKeys } from "./keys";
+import { getPerfilAutenticado } from "@/lib/auth/perfil";
 import type { FinanceiroStatus } from "@/types/database.types";
 
 export interface LancamentoRow {
@@ -101,19 +102,13 @@ export function useCriarLancamento() {
   return useMutation({
     mutationFn: async (input: LancamentoInput) => {
       const supabase = createClient();
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("id, empresa_id")
-        .maybeSingle();
-      if (!profile?.empresa_id) {
-        throw new Error("Perfil sem empresa.");
-      }
+      const perfil = await getPerfilAutenticado(supabase);
 
       const { data, error } = await supabase
         .from("lancamentos_financeiros")
         .insert({
-          empresa_id: profile.empresa_id,
-          responsavel_id: profile.id,
+          empresa_id: perfil.empresa_id,
+          responsavel_id: perfil.id,
           ...input,
         })
         .select("id")
