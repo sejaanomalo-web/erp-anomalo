@@ -20,12 +20,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { CategoriaCombobox } from "@/components/financeiro/CategoriaCombobox";
 import { toast } from "@/components/feedback/Toast";
 import { FORMAS_PAGAMENTO } from "@/lib/constants";
-import {
-  useCategoriasFinanceiras,
-  useCriarLancamento,
-} from "@/lib/queries/financeiro";
+import { useCriarLancamento } from "@/lib/queries/financeiro";
 
 interface Props {
   open: boolean;
@@ -72,7 +70,6 @@ export function LancamentoDialog({
   lockTipo = true,
 }: Props) {
   const [form, setForm] = useState<FormState>(emptyState(tipoInicial));
-  const categorias = useCategoriasFinanceiras(form.tipo);
   const criar = useCriarLancamento();
 
   // Quando o dialog reabre, força tipoInicial para corresponder ao contexto
@@ -221,29 +218,12 @@ export function LancamentoDialog({
           <div className="grid grid-cols-2 gap-md">
             <div className="flex flex-col gap-xs">
               <Label>Categoria (opcional)</Label>
-              <Select
+              <CategoriaCombobox
+                tipo={form.tipo}
                 value={form.categoria_id}
-                onValueChange={(v) => setForm({ ...form, categoria_id: v })}
-              >
-                <SelectTrigger>
-                  <SelectValue
-                    placeholder={
-                      categorias.isLoading
-                        ? "Carregando…"
-                        : (categorias.data?.length ?? 0) === 0
-                          ? "Sem categorias"
-                          : "Selecionar"
-                    }
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  {(categorias.data ?? []).map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.nome}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                onChange={(id) => setForm({ ...form, categoria_id: id })}
+                placeholder="Selecione ou crie"
+              />
             </div>
             <div className="flex flex-col gap-xs">
               <Label>Status</Label>

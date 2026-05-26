@@ -123,6 +123,53 @@ export function useCriarLancamento() {
   });
 }
 
+export function useCriarCategoriaFinanceira() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      nome: string;
+      tipo: "entrada" | "saida";
+      cor?: string | null;
+    }): Promise<{ id: string; nome: string; tipo: "entrada" | "saida" }> => {
+      const supabase = createClient();
+      const perfil = await getPerfilAutenticado(supabase);
+      const nome = input.nome.trim();
+      if (nome.length < 2) {
+        throw new Error("Nome muito curto.");
+      }
+
+      // Tenta achar uma já existente com mesmo nome+tipo (case-insensitive)
+      const { data: existente } = await supabase
+        .from("categorias_financeiras")
+        .select("id, nome, tipo")
+        .eq("empresa_id", perfil.empresa_id)
+        .eq("tipo", input.tipo)
+        .ilike("nome", nome)
+        .maybeSingle();
+      if (existente) {
+        return existente as { id: string; nome: string; tipo: "entrada" | "saida" };
+      }
+
+      const { data, error } = await supabase
+        .from("categorias_financeiras")
+        .insert({
+          empresa_id: perfil.empresa_id,
+          nome,
+          tipo: input.tipo,
+          cor: input.cor ?? null,
+          ativa: true,
+        })
+        .select("id, nome, tipo")
+        .single();
+      if (error) throw error;
+      return data as { id: string; nome: string; tipo: "entrada" | "saida" };
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["categorias-financeiras"] });
+    },
+  });
+}
+
 export function useMarcarPago() {
   const qc = useQueryClient();
   return useMutation({

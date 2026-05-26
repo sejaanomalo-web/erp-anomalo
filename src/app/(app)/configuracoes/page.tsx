@@ -9,7 +9,6 @@ import {
   Shield,
   Bell,
   Plug,
-  Tag,
   FileSearch,
   HardDrive,
   ArrowRight,
@@ -18,14 +17,13 @@ import { Hero } from "@/components/sections/Hero";
 import { Card } from "@/components/ui/card";
 
 const SECOES = [
-  { href: "/configuracoes/perfil", titulo: "Perfil", descricao: "Dados pessoais e 2FA.", icone: User },
+  { href: "/configuracoes/perfil", titulo: "Perfil", descricao: "Dados pessoais e senha.", icone: User },
   { href: "/configuracoes/aparencia", titulo: "Aparência", descricao: "Tema claro ou escuro.", icone: Palette },
   { href: "/configuracoes/empresa", titulo: "Empresa", descricao: "Razão social, CNPJ e logo.", icone: Building2 },
-  { href: "/configuracoes/usuarios", titulo: "Usuários", descricao: "Convites, papéis e desativação.", icone: Users },
-  { href: "/configuracoes/permissoes", titulo: "Permissões", descricao: "Matriz por papel.", icone: Shield },
+  { href: "/configuracoes/usuarios", titulo: "Usuários", descricao: "Cadastros, papéis e status.", icone: Users },
+  { href: "/configuracoes/permissoes", titulo: "Permissões", descricao: "Acessos por usuário.", icone: Shield },
   { href: "/configuracoes/notificacoes", titulo: "Notificações", descricao: "Preferências in-app e e-mail.", icone: Bell },
   { href: "/configuracoes/integracoes", titulo: "Integrações", descricao: "Webhooks, SMTP, monitoramento.", icone: Plug },
-  { href: "/configuracoes/categorias-financeiras", titulo: "Categorias financeiras", descricao: "Estrutura de receitas e despesas.", icone: Tag },
   { href: "/configuracoes/auditoria", titulo: "Auditoria", descricao: "Log de ações críticas.", icone: FileSearch },
   { href: "/configuracoes/backup", titulo: "Backup", descricao: "Export e retenção.", icone: HardDrive },
 ];
