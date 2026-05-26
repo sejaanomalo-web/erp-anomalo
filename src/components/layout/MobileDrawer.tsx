@@ -46,7 +46,7 @@ export function MobileDrawer() {
           <div className="flex items-center justify-between gap-2 px-4 h-16">
             <div className="flex items-center gap-2 text-text-1 font-medium text-base">
               <AnomaloMark size={18} className="text-accent" decorative={false} />
-              ERP Anômalo
+              Tato Estofados
             </div>
             <button
               type="button"

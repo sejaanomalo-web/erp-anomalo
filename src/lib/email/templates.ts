@@ -1,32 +1,31 @@
-// Templates simples em HTML inline. Sem framework de e-mail; cor preto absoluto
-// + tipografia sans-serif para coerência com a identidade.
+// Templates simples em HTML inline. Tema light (Gmail M3) com Roboto.
 
 function layout(titulo: string, corpoHtml: string) {
   return `<!doctype html>
 <html lang="pt-BR">
-  <body style="background:#000;color:#fff;font-family:Inter,system-ui,sans-serif;margin:0;padding:40px 24px;">
-    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:560px;margin:0 auto;">
+  <body style="background:#f6f8fc;color:#1f1f1f;font-family:Roboto,system-ui,sans-serif;margin:0;padding:40px 24px;">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:560px;margin:0 auto;background:#ffffff;border:1px solid #dadce0;border-radius:12px;padding:32px;">
       <tr>
-        <td style="font-size:11px;letter-spacing:1.17px;text-transform:uppercase;color:#8a93a3;padding-bottom:16px;">
-          ERP Anômalo
+        <td style="font-size:12px;font-weight:500;color:#5f6368;padding-bottom:12px;">
+          Tato Estofados
         </td>
       </tr>
       <tr>
-        <td style="font-size:24px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#fff;padding-bottom:8px;">
+        <td style="font-size:24px;font-weight:500;color:#1f1f1f;padding-bottom:8px;">
           ${titulo}
         </td>
       </tr>
       <tr>
-        <td style="height:1px;background:#C9953A;width:64px;display:block;"></td>
+        <td style="height:1px;background:#dadce0;width:100%;display:block;"></td>
       </tr>
       <tr>
-        <td style="padding-top:24px;font-size:14px;line-height:1.6;color:#c7cdd9;">
+        <td style="padding-top:20px;font-size:14px;line-height:1.6;color:#1f1f1f;">
           ${corpoHtml}
         </td>
       </tr>
       <tr>
-        <td style="padding-top:32px;font-size:11px;color:#5b6473;border-top:1px solid rgba(255,255,255,0.06);margin-top:24px;">
-          Anômalo Hub.
+        <td style="padding-top:24px;font-size:12px;color:#5f6368;border-top:1px solid #dadce0;margin-top:24px;">
+          Tato Estofados.
         </td>
       </tr>
     </table>
@@ -34,15 +33,12 @@ function layout(titulo: string, corpoHtml: string) {
 </html>`;
 }
 
-export function resetSenhaTemplate(opts: {
-  link: string;
-  nome?: string;
-}) {
+export function resetSenhaTemplate(opts: { link: string; nome?: string }) {
   return layout(
     "Redefinir senha",
     `<p>${opts.nome ? `Olá, ${opts.nome}.` : "Olá."}</p>
      <p>Para criar uma nova senha, abra o link abaixo. Ele é válido por 24 horas.</p>
-     <p><a href="${opts.link}" style="color:#C9953A;text-decoration:none;border-bottom:1px solid #C9953A;">Redefinir senha</a></p>
+     <p><a href="${opts.link}" style="color:#0b57d0;text-decoration:none;border-bottom:1px solid #0b57d0;">Redefinir senha</a></p>
      <p>Se você não pediu, ignore este e-mail.</p>`,
   );
 }
@@ -53,9 +49,9 @@ export function conviteUsuarioTemplate(opts: {
   papel: string;
 }) {
   return layout(
-    "Acesso ao ERP Anômalo",
-    `<p>Você foi convidado a acessar o ERP Anômalo da ${opts.empresa}, como ${opts.papel}.</p>
-     <p><a href="${opts.link}" style="color:#C9953A;text-decoration:none;border-bottom:1px solid #C9953A;">Criar acesso</a></p>
+    "Acesso ao sistema Tato Estofados",
+    `<p>Você foi convidado a acessar o sistema da ${opts.empresa}, como ${opts.papel}.</p>
+     <p><a href="${opts.link}" style="color:#0b57d0;text-decoration:none;border-bottom:1px solid #0b57d0;">Criar acesso</a></p>
      <p>O convite expira em 7 dias.</p>`,
   );
 }
@@ -68,7 +64,7 @@ export function alertaEstoqueTemplate(opts: {
 }) {
   return layout(
     "Estoque crítico",
-    `<p>O item <strong style="color:#fff;">${opts.item}</strong> chegou em ${opts.estoqueAtual} ${opts.unidade ?? "unidades"} (mínimo: ${opts.estoqueMinimo}).</p>
+    `<p>O item <strong style="color:#1f1f1f;">${opts.item}</strong> chegou em ${opts.estoqueAtual} ${opts.unidade ?? "unidades"} (mínimo: ${opts.estoqueMinimo}).</p>
      <p>Vale conferir a reposição.</p>`,
   );
 }
@@ -80,7 +76,7 @@ export function alertaContaTemplate(opts: {
 }) {
   return layout(
     "Conta a vencer",
-    `<p>${opts.descricao} no valor de <strong style="color:#fff;">${opts.valor}</strong> vence em ${opts.vencimento}.</p>`,
+    `<p>${opts.descricao} no valor de <strong style="color:#1f1f1f;">${opts.valor}</strong> vence em ${opts.vencimento}.</p>`,
   );
 }
 
@@ -92,6 +88,6 @@ export function notificacaoVendaTemplate(opts: {
 }) {
   return layout(
     "Venda fechada",
-    `<p>O vendedor ${opts.vendedor} registrou a venda <strong style="color:#fff;">#${opts.numero}</strong> para ${opts.cliente} no valor de ${opts.valor}.</p>`,
+    `<p>O vendedor ${opts.vendedor} registrou a venda <strong style="color:#1f1f1f;">#${opts.numero}</strong> para ${opts.cliente} no valor de ${opts.valor}.</p>`,
   );
 }

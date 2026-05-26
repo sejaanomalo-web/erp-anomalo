@@ -19,16 +19,16 @@ const robotoMono = Roboto_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "ERP Anômalo",
-    template: "%s · ERP Anômalo",
+    default: "Tato Estofados",
+    template: "%s · Tato Estofados",
   },
-  description: "Sistema operacional Anômalo Hub",
-  applicationName: "ERP Anômalo",
+  description: "Sistema operacional Tato Estofados",
+  applicationName: "Tato Estofados",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "ERP Anômalo",
+    title: "Tato Estofados",
   },
   formatDetection: {
     telephone: false,

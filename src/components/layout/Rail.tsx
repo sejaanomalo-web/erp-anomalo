@@ -64,7 +64,7 @@ export function Rail({ collapsed, onToggle }: RailProps) {
             className="flex items-center gap-2 text-text-1 font-medium text-base"
           >
             <AnomaloMark size={18} className="text-accent" decorative={false} />
-            <span>ERP Anômalo</span>
+            <span>Tato Estofados</span>
           </Link>
         )}
       </div>
