@@ -5,11 +5,12 @@ interface EyebrowProps {
   className?: string;
 }
 
+// Eyebrow Gmail-style: sentence case, Roboto 500, cinza M3.
 export function Eyebrow({ children, className }: EyebrowProps) {
   return (
     <span
       className={cn(
-        "text-label-caps text-text-3 inline-block uppercase",
+        "text-[0.75rem] font-medium tracking-[0.025em] text-text-3 inline-block",
         className,
       )}
     >

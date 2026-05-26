@@ -4,6 +4,8 @@ interface AnomaloMarkProps {
   decorative?: boolean;
 }
 
+// Λ em accent (Google Blue 700 no tema light). Mantém a identidade
+// estrutural mas adota a paleta Gmail M3.
 export function AnomaloMark({
   size = 16,
   className,
@@ -24,7 +26,7 @@ export function AnomaloMark({
         stroke="currentColor"
         strokeWidth="2"
         fill="none"
-        strokeLinejoin="miter"
+        strokeLinejoin="round"
       />
     </svg>
   );

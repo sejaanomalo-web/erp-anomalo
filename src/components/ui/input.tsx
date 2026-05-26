@@ -5,15 +5,14 @@ import { cn } from "@/lib/utils";
 
 export type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 
+// Gmail/M3 input: borda fina cinza, fundo branco, focus em Google Blue.
+// Inputs numéricos: select() ao focar para evitar lutar com o `0`.
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type = "text", onFocus, ...props }, ref) => {
     const isNumeric = type === "number";
 
     function handleFocus(e: React.FocusEvent<HTMLInputElement>) {
-      // Inputs numéricos: ao focar, seleciona o conteúdo todo para que o
-      // usuário não precise apagar o 0 padrão antes de digitar.
       if (isNumeric) {
-        // setTimeout porque alguns browsers movem o cursor depois do focus event
         const target = e.currentTarget;
         setTimeout(() => target.select(), 0);
       }
@@ -26,7 +25,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         type={type}
         onFocus={handleFocus}
         className={cn(
-          "flex h-10 w-full border border-border-medium bg-surface-3 px-md py-sm text-body-md text-text-1 placeholder:text-text-4 transition-colors duration-fast file:border-0 file:bg-transparent file:text-body-sm file:font-medium focus-visible:outline-none focus-visible:border-[var(--accent-strong)] focus-visible:shadow-[0_0_0_1px_var(--accent-strong)] disabled:cursor-not-allowed disabled:opacity-60",
+          "flex h-10 w-full rounded-md border border-border-medium bg-surface-1 px-3 py-2 text-body-md text-text-1 placeholder:text-text-3 transition-colors duration-fast file:border-0 file:bg-transparent file:text-body-sm file:font-medium focus-visible:outline-none focus-visible:border-accent focus-visible:shadow-[0_0_0_1px_var(--accent)] disabled:cursor-not-allowed disabled:opacity-50",
           className,
         )}
         {...props}

@@ -16,7 +16,7 @@ export const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      "flex h-10 w-full items-center justify-between border border-border-medium bg-surface-3 px-md py-sm text-body-md text-text-1 transition-colors duration-fast placeholder:text-text-4 focus:outline-none focus:border-[var(--accent-strong)] focus:shadow-[0_0_0_1px_var(--accent-strong)] disabled:cursor-not-allowed disabled:opacity-60 [&>span]:line-clamp-1",
+      "flex h-10 w-full items-center justify-between rounded-md border border-border-medium bg-surface-1 px-3 py-2 text-body-md text-text-1 transition-colors duration-fast placeholder:text-text-3 focus:outline-none focus:border-accent focus:shadow-[0_0_0_1px_var(--accent)] disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
       className,
     )}
     {...props}
@@ -73,7 +73,7 @@ export const SelectContent = React.forwardRef<
       ref={ref}
       position={position}
       className={cn(
-        "relative z-[400] max-h-96 min-w-[8rem] overflow-hidden bg-surface-1 border border-border-thin shadow-elevated",
+        "relative z-[400] max-h-96 min-w-[8rem] overflow-hidden rounded-lg bg-surface-1 border border-border-thin shadow-elevated",
         position === "popper" && "translate-y-1",
         className,
       )}
@@ -114,7 +114,7 @@ export const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex cursor-default select-none items-center gap-sm py-sm pl-xl pr-md text-body-md text-text-2 outline-none focus:bg-surface-2 focus:text-text-1 data-[state=checked]:text-text-1 data-[disabled]:opacity-50 data-[disabled]:pointer-events-none",
+      "relative flex cursor-default select-none items-center gap-sm py-sm pl-xl pr-md text-body-md text-text-2 outline-none rounded-md focus:bg-[var(--state-hover)] focus:text-text-1 data-[state=checked]:text-text-1 data-[disabled]:opacity-50 data-[disabled]:pointer-events-none",
       className,
     )}
     {...props}

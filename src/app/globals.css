@@ -3,62 +3,90 @@
 @tailwind utilities;
 
 @layer base {
+  /* Gmail / Material 3 light tokens — canvas cool-white com Google Blue como ação */
   :root,
-  [data-theme="dark"] {
-    --background: #000000;
-    --background-alt: #0f0c08;
-    --surface-1: #0f0c08;
-    --surface-2: #18130c;
-    --surface-3: #221b10;
-
-    --accent: #e5b82a;
-    --accent-hover: #f0c435;
-    --accent-active: #c9a11d;
-    --accent-subtle: rgba(229, 184, 42, 0.1);
-    --accent-strong: rgba(229, 184, 42, 0.4);
-
-    --text-1: #fdf9ec;
-    --text-2: #d4ccb2;
-    --text-3: #8f8771;
-    --text-4: #5b5645;
-
-    --border-thin: rgba(229, 184, 42, 0.06);
-    --border-medium: rgba(229, 184, 42, 0.12);
-    --border-accent: rgba(229, 184, 42, 0.4);
-
-    --rail-width: 240px;
-    --rail-width-collapsed: 72px;
-
-    --success: #16a34a;
-    --warning: #eab308;
-    --error: #ef4444;
-
-    color-scheme: dark;
-  }
-
   [data-theme="light"] {
-    --background: #faf6ec;
-    --background-alt: #f1ebda;
+    --background: #f6f8fc;
+    --background-alt: #f0f4f9;
     --surface-1: #ffffff;
-    --surface-2: #f4eedd;
-    --surface-3: #ebe2cc;
+    --surface-2: #f0f4f9;
+    --surface-3: #e9eef6;
 
-    --accent: #c9a11d;
-    --accent-hover: #d4ac28;
-    --accent-active: #b59016;
-    --accent-subtle: rgba(201, 161, 29, 0.14);
-    --accent-strong: rgba(201, 161, 29, 0.45);
+    /* Google Blue 700 (GM2) — primary action / focus / link */
+    --accent: #0b57d0;
+    --accent-hover: #1a73e8;
+    --accent-active: #062e6f;
+    --accent-subtle: rgba(11, 87, 208, 0.08);
+    --accent-strong: rgba(11, 87, 208, 0.4);
 
-    --text-1: #1a1610;
-    --text-2: #3a342a;
-    --text-3: #6a6354;
-    --text-4: #9a9385;
+    /* M3 secondary container — Compose pill, active nav-rail */
+    --compose: #c2e7ff;
+    --compose-foreground: #001d35;
 
-    --border-thin: rgba(26, 22, 16, 0.08);
-    --border-medium: rgba(26, 22, 16, 0.14);
-    --border-accent: rgba(201, 161, 29, 0.45);
+    /* M3 primary container — selected row tint */
+    --selected: #d3e3fd;
+    --selected-foreground: #001b3f;
+
+    --text-1: #1f1f1f;
+    --text-2: #444746;
+    --text-3: #5f6368;
+    --text-4: #80868b;
+
+    --border-thin: #dadce0;
+    --border-medium: #c4c7c5;
+    --border-accent: rgba(11, 87, 208, 0.4);
+
+    --rail-width: 256px;
+    --rail-width-collapsed: 80px;
+    --row-height-inbox: 40px;
+
+    --success: #34a853;
+    --warning: #fbbc04;
+    --error: #ea4335;
+    --info: #4285f4;
+
+    /* M3 state layers — overlay translúcido em hover/focus/pressed */
+    --state-hover: rgba(31, 31, 31, 0.04);
+    --state-focus: rgba(31, 31, 31, 0.08);
+    --state-pressed: rgba(31, 31, 31, 0.12);
 
     color-scheme: light;
+  }
+
+  /* Dark — M3 dark surface ladder + Google Blue dark variant */
+  [data-theme="dark"] {
+    --background: #1f1f1f;
+    --background-alt: #1a1a1a;
+    --surface-1: #2d2d2d;
+    --surface-2: #282828;
+    --surface-3: #333333;
+
+    --accent: #a8c7fa;
+    --accent-hover: #c1d9ff;
+    --accent-active: #8db4f7;
+    --accent-subtle: rgba(168, 199, 250, 0.1);
+    --accent-strong: rgba(168, 199, 250, 0.4);
+
+    --compose: #004a77;
+    --compose-foreground: #c2e7ff;
+
+    --selected: #062e6f;
+    --selected-foreground: #d2e3fc;
+
+    --text-1: #e3e3e3;
+    --text-2: #bdc1c6;
+    --text-3: #9aa0a6;
+    --text-4: #80868b;
+
+    --border-thin: #3c4043;
+    --border-medium: #5f6368;
+    --border-accent: rgba(168, 199, 250, 0.4);
+
+    --state-hover: rgba(255, 255, 255, 0.05);
+    --state-focus: rgba(255, 255, 255, 0.08);
+    --state-pressed: rgba(255, 255, 255, 0.12);
+
+    color-scheme: dark;
   }
 
   * {
@@ -74,24 +102,21 @@
   body {
     background: var(--background);
     color: var(--text-1);
-    font-family: var(--font-manrope), system-ui, sans-serif;
-    font-feature-settings: "ss01", "ss02", "cv11", "tnum";
+    font-family: var(--font-roboto), Roboto, system-ui, sans-serif;
+    font-feature-settings: "kern", "liga", "tnum";
     min-height: 100vh;
     overflow-x: clip;
   }
 
   h1,
-  h2 {
-    font-family: var(--font-cormorant), Georgia, serif;
-    text-transform: uppercase;
-    font-feature-settings: "kern", "liga";
-  }
-
+  h2,
   h3,
   h4,
   h5,
   h6 {
-    font-family: var(--font-manrope), system-ui, sans-serif;
+    font-family: var(--font-roboto), Roboto, system-ui, sans-serif;
+    letter-spacing: 0;
+    text-transform: none;
   }
 
   ::selection {
@@ -99,7 +124,6 @@
     color: var(--text-1);
   }
 
-  /* iOS Safari: prevent input zoom */
   @media (max-width: 768px) {
     input,
     select,
@@ -110,30 +134,31 @@
 }
 
 @layer components {
+  /* Card padrão do Gmail: branco com borda fininha, rounded 12. */
   .solid-surface {
     background: var(--surface-1);
     border: 1px solid var(--border-thin);
-    transition: background 200ms ease, border-color 200ms ease,
-      box-shadow 200ms ease;
+    border-radius: 12px;
+    transition: background-color 150ms cubic-bezier(0.2, 0, 0, 1),
+      box-shadow 150ms cubic-bezier(0.2, 0, 0, 1);
   }
 
   .solid-surface-hover:hover {
-    background: var(--surface-2);
-    border-color: var(--accent-strong);
-    box-shadow: 0 0 0 1px rgba(229, 184, 42, 0.2);
+    background-color: var(--surface-2);
+    box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.1);
   }
 
+  /* Divisor neutro (substitui o gold-divider antigo) */
   .gold-divider {
     width: 64px;
     height: 1px;
-    background: var(--accent);
+    background: var(--border-thin);
   }
 
   .eyebrow {
     font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    font-weight: 500;
+    letter-spacing: 0.025em;
     color: var(--text-3);
   }
 
@@ -143,7 +168,7 @@
 
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: rgba(229, 184, 42, 0.2) transparent;
+    scrollbar-color: rgba(60, 64, 67, 0.2) transparent;
   }
 
   .scrollbar-thin::-webkit-scrollbar {
@@ -152,11 +177,30 @@
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: rgba(229, 184, 42, 0.2);
+    background: rgba(60, 64, 67, 0.2);
+    border-radius: 9999px;
   }
 
   .scrollbar-thin::-webkit-scrollbar-track {
     background: transparent;
+  }
+
+  /* M3 state layer — overlay translúcido on-surface @ 4% / 8% / 12% */
+  .state-layer {
+    transition: background-color 150ms cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  .state-layer:hover {
+    background-color: var(--state-hover);
+  }
+
+  .state-layer:focus-visible {
+    background-color: var(--state-focus);
+    outline: none;
+  }
+
+  .state-layer:active {
+    background-color: var(--state-pressed);
   }
 }
 
@@ -166,19 +210,13 @@
     bottom: 16px;
     right: 16px;
     z-index: 30;
-    opacity: 0.1;
+    opacity: 0.32;
     pointer-events: none;
     color: var(--accent);
   }
 
   .focus-ring {
     outline: none;
-    box-shadow: 0 0 0 1px var(--accent-strong);
-  }
-
-  /* H1/H2 com a serif Cormorant — tracking ajustado para uppercase */
-  .font-display {
-    font-family: var(--font-cormorant), Georgia, serif;
-    font-feature-settings: "kern", "liga";
+    box-shadow: 0 0 0 2px var(--accent);
   }
 }

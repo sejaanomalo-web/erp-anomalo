@@ -22,7 +22,8 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 const STORAGE_KEY = "erp-anomalo:theme";
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("dark");
+  // Gmail é light-first; dark continua disponível em /configuracoes/aparencia.
+  const [theme, setThemeState] = useState<Theme>("light");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
