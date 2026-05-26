@@ -281,7 +281,7 @@ export default function VendedorDetalhePage({
         </div>
       </div>
 
-      <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-md">
+      <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-md">
         <KPICard label="Vendas fechadas" valor={data.agregado.totalVendas} />
         <KPICard
           label="Orçamentos abertos"
@@ -290,11 +290,6 @@ export default function VendedorDetalhePage({
         <KPICard
           label="Valor fechado"
           valor={data.agregado.valorFechado}
-          formato="moeda"
-        />
-        <KPICard
-          label="Comissão acumulada"
-          valor={data.agregado.comissaoTotal}
           formato="moeda"
         />
       </section>

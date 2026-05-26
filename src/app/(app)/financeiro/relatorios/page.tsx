@@ -9,7 +9,6 @@ const RELATORIOS = [
   { id: "dre", titulo: "DRE simplificado", descricao: "Receitas, despesas e resultado por período." },
   { id: "fluxo", titulo: "Fluxo de caixa", descricao: "Entradas e saídas diárias com saldo acumulado." },
   { id: "comparativo", titulo: "Comparativo de período", descricao: "Compare dois recortes lado a lado." },
-  { id: "comissoes", titulo: "Comissões a pagar", descricao: "Por vendedor, com status." },
 ];
 
 export default function FinanceiroRelatoriosPage() {

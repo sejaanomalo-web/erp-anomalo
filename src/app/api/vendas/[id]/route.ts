@@ -64,9 +64,7 @@ export async function DELETE(
     );
   }
 
-  // CASCADE em venda_itens, producoes (via venda_id), lancamentos
-  // (referenciam venda mas com on delete set null no fk de venda_id; vamos
-  // limpar manualmente o lançamento de comissão associado).
+  // Limpa lançamentos financeiros e produções vinculados antes de remover a venda.
   await supabase.from("lancamentos_financeiros").delete().eq("venda_id", id);
   await supabase.from("producoes").delete().eq("venda_id", id);
   // venda_itens é CASCADE pelo fk; excluir venda cuida.

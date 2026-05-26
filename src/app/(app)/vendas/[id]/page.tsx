@@ -108,12 +108,6 @@ export default function VendaDetalhePage({
                 ["Desconto", formatCurrency(Number(venda.desconto))],
                 ["Forma de pagamento", venda.forma_pagamento ?? "—"],
                 ["Parcelas", String(venda.parcelas)],
-                [
-                  "Comissão",
-                  isOrcamento
-                    ? "—"
-                    : formatCurrency(Number(venda.comissao_valor ?? 0)),
-                ],
                 ["Data do cadastro", formatDate(venda.data_venda)],
                 ["Entrega prevista", formatDate(venda.data_prevista_entrega)],
               ].map(([k, v]) => (

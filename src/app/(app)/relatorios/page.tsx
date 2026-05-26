@@ -30,11 +30,6 @@ const CATEGORIAS = [
     titulo: "CRM",
     relatorios: ["Funil de conversão", "Interações por vendedor"],
   },
-  {
-    id: "comissoes",
-    titulo: "Comissões",
-    relatorios: ["Comissões a pagar", "Comissões pagas"],
-  },
 ];
 
 export default function RelatoriosPage() {

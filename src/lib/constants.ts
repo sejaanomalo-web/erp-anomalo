@@ -100,7 +100,6 @@ export const FORMAS_PAGAMENTO: { value: string; label: string }[] = [
   { value: "cheque", label: "Cheque" },
 ];
 
-export const COMISSAO_DEFAULT_PERCENT = 5; // % sobre valor de venda
 export const AUDIT_LOG_RETENTION_YEARS = 5;
 export const PAGE_SIZE_DEFAULT = 25;
 export const PUBLIC_TOKEN_DEFAULT_EXPIRY_DAYS = 90;

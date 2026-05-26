@@ -67,35 +67,28 @@ export async function DELETE(
   }
 
   // Verifica vínculos críticos antes de tentar deletar
-  const [vendasRes, lancVendComRes, lancRespRes, prodRes, intRes] =
-    await Promise.all([
-      supabase
-        .from("vendas")
-        .select("id", { count: "exact", head: true })
-        .eq("vendedor_id", id),
-      supabase
-        .from("lancamentos_financeiros")
-        .select("id", { count: "exact", head: true })
-        .eq("vendedor_comissao_id", id),
-      supabase
-        .from("lancamentos_financeiros")
-        .select("id", { count: "exact", head: true })
-        .eq("responsavel_id", id),
-      supabase
-        .from("producoes")
-        .select("id", { count: "exact", head: true })
-        .eq("responsavel_id", id),
-      supabase
-        .from("interacoes")
-        .select("id", { count: "exact", head: true })
-        .eq("usuario_id", id),
-    ]);
+  const [vendasRes, lancRespRes, prodRes, intRes] = await Promise.all([
+    supabase
+      .from("vendas")
+      .select("id", { count: "exact", head: true })
+      .eq("vendedor_id", id),
+    supabase
+      .from("lancamentos_financeiros")
+      .select("id", { count: "exact", head: true })
+      .eq("responsavel_id", id),
+    supabase
+      .from("producoes")
+      .select("id", { count: "exact", head: true })
+      .eq("responsavel_id", id),
+    supabase
+      .from("interacoes")
+      .select("id", { count: "exact", head: true })
+      .eq("usuario_id", id),
+  ]);
 
   const vinculos: string[] = [];
   if ((vendasRes.count ?? 0) > 0)
     vinculos.push(`${vendasRes.count} venda(s) como vendedor`);
-  if ((lancVendComRes.count ?? 0) > 0)
-    vinculos.push(`${lancVendComRes.count} lançamento(s) de comissão`);
   if ((lancRespRes.count ?? 0) > 0)
     vinculos.push(
       `${lancRespRes.count} lançamento(s) financeiro(s) como responsável`,

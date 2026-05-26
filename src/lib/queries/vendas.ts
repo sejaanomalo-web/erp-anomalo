@@ -86,8 +86,6 @@ export interface VendaDetail extends VendaListRow {
   taxa: number;
   forma_pagamento: string | null;
   parcelas: number;
-  comissao_percentual: number | null;
-  comissao_valor: number | null;
   data_prevista_producao: string | null;
   endereco_entrega: Record<string, unknown> | null;
   observacoes: string | null;

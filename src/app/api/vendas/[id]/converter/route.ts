@@ -1,8 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { addDays } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
 import { logAudit } from "@/lib/audit/logger";
-import { COMISSAO_DEFAULT_PERCENT } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -36,7 +34,7 @@ export async function POST(_request: NextRequest, ctx: RouteContext) {
   const { data: venda } = await supabase
     .from("vendas")
     .select(
-      "id, numero, empresa_id, vendedor_id, tipo, status, valor_total, data_venda, data_prevista_entrega, data_prevista_producao, forma_pagamento",
+      "id, numero, empresa_id, tipo, status, data_venda, data_prevista_entrega, data_prevista_producao",
     )
     .eq("id", id)
     .maybeSingle();
@@ -54,16 +52,11 @@ export async function POST(_request: NextRequest, ctx: RouteContext) {
     );
   }
 
-  const valorTotal = Number(venda.valor_total);
-  const comissaoValor = (valorTotal * COMISSAO_DEFAULT_PERCENT) / 100;
-
   const { error: updateErr } = await supabase
     .from("vendas")
     .update({
       tipo: "venda",
       status: "aguardando_producao",
-      comissao_percentual: COMISSAO_DEFAULT_PERCENT,
-      comissao_valor: comissaoValor,
     })
     .eq("id", id);
 
@@ -88,30 +81,13 @@ export async function POST(_request: NextRequest, ctx: RouteContext) {
     await supabase.from("producoes").insert(producoesPayload);
   }
 
-  // Lançamento de comissão
-  await supabase.from("lancamentos_financeiros").insert({
-    empresa_id: profile.empresa_id,
-    tipo: "saida",
-    descricao: `Comissão venda #${venda.numero}`,
-    valor: comissaoValor,
-    data_competencia: venda.data_venda,
-    data_vencimento: addDays(new Date(venda.data_venda), 30)
-      .toISOString()
-      .slice(0, 10),
-    status: "pendente",
-    forma_pagamento: venda.forma_pagamento,
-    venda_id: id,
-    vendedor_comissao_id: venda.vendedor_id,
-    responsavel_id: profile.id,
-  });
-
   await logAudit({
     modulo: "vendas",
     acao: "converter_orcamento",
     entidade: "vendas",
     entidadeId: id,
     dadosAntes: { tipo: "orcamento" },
-    dadosDepois: { tipo: "venda", comissao_valor: comissaoValor },
+    dadosDepois: { tipo: "venda" },
   });
 
   return NextResponse.json({ ok: true });

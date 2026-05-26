@@ -509,7 +509,7 @@ export default function VendaEditarPage({
         open={confirmDelete}
         onOpenChange={setConfirmDelete}
         titulo={`Excluir venda #${venda.data.numero}?`}
-        descricao="A venda, seus itens, produção vinculada e o lançamento de comissão serão removidos. Não dá para desfazer."
+        descricao="A venda, seus itens, produção vinculada e lançamentos financeiros associados serão removidos. Não dá para desfazer."
         variant="destructive"
         textoConfirmar="Excluir definitivamente"
         palavraConfirmacao="EXCLUIR"

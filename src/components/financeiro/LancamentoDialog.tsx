@@ -214,7 +214,7 @@ export function LancamentoDialog({
                 placeholder={
                   form.tipo === "entrada"
                     ? "Cliente, venda balcão, indicação…"
-                    : "Fornecedor, comissão, prestador…"
+                    : "Fornecedor, prestador, despesa fixa…"
                 }
               />
             </div>

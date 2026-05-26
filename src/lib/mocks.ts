@@ -75,7 +75,7 @@ export const mockAtividade = [
   {
     id: "4",
     tipo: "financeiro",
-    descricao: "Comissão de Maio liquidada para Bruna Marques",
+    descricao: "Pagamento ao fornecedor Tessile confirmado",
     data: iso(subDays(today, 2)),
   },
 ];
@@ -214,9 +214,9 @@ export const mockLeads = Array.from({ length: 10 }).map((_, i) => ({
 }));
 
 export const mockVendedores = [
-  { id: "u-1", nome: "Bruna Marques", vendasMes: 12, comissaoMes: 6_800, ticketMedio: 5_400, conversao: 38 },
-  { id: "u-2", nome: "Diego Faria", vendasMes: 9, comissaoMes: 4_300, ticketMedio: 4_900, conversao: 32 },
-  { id: "u-3", nome: "Larissa Castro", vendasMes: 7, comissaoMes: 3_100, ticketMedio: 4_200, conversao: 28 },
+  { id: "u-1", nome: "Bruna Marques", vendasMes: 12, ticketMedio: 5_400, conversao: 38 },
+  { id: "u-2", nome: "Diego Faria", vendasMes: 9, ticketMedio: 4_900, conversao: 32 },
+  { id: "u-3", nome: "Larissa Castro", vendasMes: 7, ticketMedio: 4_200, conversao: 28 },
 ];
 
 export const mockFinanceiroSerie = Array.from({ length: 12 }).map((_, i) => ({
@@ -227,7 +227,7 @@ export const mockFinanceiroSerie = Array.from({ length: 12 }).map((_, i) => ({
 
 export const mockContasAPagar = Array.from({ length: 6 }).map((_, i) => ({
   id: `cp-${i}`,
-  descricao: ["Fornecedor Tessile", "Fornecedor Couromax", "Aluguel galpão", "Comissão Bruna Marques", "Conta de luz", "Pró-labore"][i],
+  descricao: ["Fornecedor Tessile", "Fornecedor Couromax", "Aluguel galpão", "Manutenção máquinas", "Conta de luz", "Pró-labore"][i],
   valor: [4_800, 3_200, 6_500, 6_800, 1_200, 12_000][i],
   vencimento: iso(addDays(today, [-2, 1, 3, 6, 9, 15][i])),
   status: (["atrasado", "pendente", "pendente", "pendente", "pendente", "pendente"] as const)[i],

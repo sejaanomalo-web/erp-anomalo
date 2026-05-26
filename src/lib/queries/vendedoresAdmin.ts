@@ -40,7 +40,6 @@ export interface VendedorAgregado {
   totalOrcamentos: number;
   valorFechado: number;
   ticketMedio: number;
-  comissaoTotal: number;
 }
 
 interface ItemVendido {
@@ -78,7 +77,7 @@ export function useVendedor(id: string) {
       const { data: vendasRaw, error: vendasErr } = await supabase
         .from("vendas")
         .select(
-          "id, numero, tipo, valor_total, comissao_valor, data_venda, itens:venda_itens(id, produto_descricao, quantidade, valor_unitario)",
+          "id, numero, tipo, valor_total, data_venda, itens:venda_itens(id, produto_descricao, quantidade, valor_unitario)",
         )
         .eq("vendedor_id", id)
         .order("data_venda", { ascending: false })
@@ -90,7 +89,6 @@ export function useVendedor(id: string) {
         numero: number;
         tipo: "venda" | "orcamento";
         valor_total: number;
-        comissao_valor: number | null;
         data_venda: string;
         itens: {
           id: string;
@@ -125,10 +123,6 @@ export function useVendedor(id: string) {
           totalOrcamentos: vendas.length - fechadas.length,
           valorFechado,
           ticketMedio: fechadas.length ? valorFechado / fechadas.length : 0,
-          comissaoTotal: fechadas.reduce(
-            (acc, v) => acc + Number(v.comissao_valor ?? 0),
-            0,
-          ),
         },
         itens,
       };

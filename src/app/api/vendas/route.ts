@@ -1,9 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { addDays } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
 import { criarVendaSchema } from "@/lib/validation/vendas";
 import { logAudit } from "@/lib/audit/logger";
-import { COMISSAO_DEFAULT_PERCENT } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -126,8 +124,6 @@ export async function POST(request: NextRequest) {
     0,
   );
   const valorTotal = Math.max(0, valorItens - input.desconto - input.taxa);
-  const comissaoPercentual = COMISSAO_DEFAULT_PERCENT;
-  const comissaoValor = (valorTotal * comissaoPercentual) / 100;
   const isOrcamento = input.tipo === "orcamento";
 
   // 2. Insert venda
@@ -144,8 +140,6 @@ export async function POST(request: NextRequest) {
       taxa: input.taxa,
       forma_pagamento: input.forma_pagamento ?? null,
       parcelas: input.parcelas,
-      comissao_percentual: isOrcamento ? null : comissaoPercentual,
-      comissao_valor: isOrcamento ? null : comissaoValor,
       data_venda: input.data_venda,
       data_prevista_producao: input.data_prevista_producao ?? null,
       data_prevista_entrega: input.data_prevista_entrega,
@@ -189,7 +183,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // 4. Produção + comissão são criados SÓ quando é venda fechada.
+  // 4. Produção é criada SÓ quando é venda fechada.
   if (!isOrcamento) {
     const producoesPayload = (itensCriados ?? []).map((it) => ({
       venda_id: venda.id,
@@ -201,22 +195,6 @@ export async function POST(request: NextRequest) {
     if (producoesPayload.length > 0) {
       await supabase.from("producoes").insert(producoesPayload);
     }
-
-    await supabase.from("lancamentos_financeiros").insert({
-      empresa_id: profile.empresa_id,
-      tipo: "saida",
-      descricao: `Comissão venda #${venda.numero}`,
-      valor: comissaoValor,
-      data_competencia: input.data_venda,
-      data_vencimento: addDays(new Date(input.data_venda), 30)
-        .toISOString()
-        .slice(0, 10),
-      status: "pendente",
-      forma_pagamento: input.forma_pagamento ?? null,
-      venda_id: venda.id,
-      vendedor_comissao_id: vendedorId,
-      responsavel_id: profile.id,
-    });
   }
 
   // 5. Audit
