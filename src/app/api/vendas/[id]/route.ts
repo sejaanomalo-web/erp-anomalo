@@ -64,6 +64,18 @@ export async function DELETE(
     );
   }
 
+  // Captura snapshot completo ANTES de qualquer delete, pra audit log preservar
+  // o rastro do que foi removido em cascata (itens, lançamentos, produções).
+  const [snapshotItens, snapshotLancamentos, snapshotProducoes] =
+    await Promise.all([
+      supabase.from("venda_itens").select("*").eq("venda_id", id),
+      supabase
+        .from("lancamentos_financeiros")
+        .select("*")
+        .eq("venda_id", id),
+      supabase.from("producoes").select("*").eq("venda_id", id),
+    ]);
+
   // Limpa lançamentos financeiros e produções vinculados antes de remover a venda.
   await supabase.from("lancamentos_financeiros").delete().eq("venda_id", id);
   await supabase.from("producoes").delete().eq("venda_id", id);
@@ -85,7 +97,14 @@ export async function DELETE(
     acao: "delete",
     entidade: "vendas",
     entidadeId: id,
-    dadosAntes: JSON.parse(JSON.stringify(venda)),
+    dadosAntes: JSON.parse(
+      JSON.stringify({
+        venda,
+        itens: snapshotItens.data ?? [],
+        lancamentos: snapshotLancamentos.data ?? [],
+        producoes: snapshotProducoes.data ?? [],
+      }),
+    ),
   });
 
   return NextResponse.json({ ok: true });
@@ -116,7 +135,15 @@ export async function PATCH(
     );
   }
 
-  const body = await request.json().catch(() => null);
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { message: "Corpo da requisição inválido (JSON malformado)." },
+      { status: 400 },
+    );
+  }
   const parsed = atualizarVendaSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(

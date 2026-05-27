@@ -27,7 +27,15 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const body = await request.json().catch(() => null);
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { message: "Corpo da requisição inválido (JSON malformado)." },
+      { status: 400 },
+    );
+  }
   const parsed = criarVendaSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
@@ -75,14 +83,25 @@ export async function POST(request: NextRequest) {
 
   if (!clienteId && input.cliente_inline) {
     const telefoneLimpo = input.cliente_inline.telefone.replace(/\D/g, "");
-    if (telefoneLimpo.length >= 8) {
-      const { data: existente } = await supabase
+    // Match estrito: normaliza os dígitos dos dois lados e compara o número
+    // inteiro, OU os últimos 11 (DDD + celular). Antes era ilike com 8 últimos,
+    // o que causava colisão entre números de DDDs diferentes terminando igual.
+    if (telefoneLimpo.length >= 10) {
+      const { data: candidatos } = await supabase
         .from("clientes")
-        .select("id")
+        .select("id, telefone")
         .eq("empresa_id", profile.empresa_id)
-        .ilike("telefone", `%${telefoneLimpo.slice(-8)}%`)
-        .maybeSingle();
-      if (existente?.id) clienteId = existente.id as string;
+        .not("telefone", "is", null);
+      const match = (candidatos ?? []).find((c) => {
+        const armazenado = (c.telefone ?? "").replace(/\D/g, "");
+        if (!armazenado) return false;
+        if (armazenado === telefoneLimpo) return true;
+        if (armazenado.length >= 11 && telefoneLimpo.length >= 11) {
+          return armazenado.slice(-11) === telefoneLimpo.slice(-11);
+        }
+        return false;
+      });
+      if (match?.id) clienteId = match.id as string;
     }
 
     if (!clienteId) {
