@@ -1,16 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Rail } from "./Rail";
 import { MobileDrawer } from "./MobileDrawer";
 import { NotificationBell } from "./NotificationBell";
 import { CommandPaletteTrigger } from "./CommandPaletteTrigger";
+import { AnomaloMark } from "@/components/brand/AnomaloMark";
 
 const STORAGE_KEY = "erp-anomalo:rail-collapsed";
 
-// Gmail-style chrome: 2-pane (sidebar + content), light cool-white canvas.
-// Sem watermark decorativo (M3 produtividade: cada elemento precisa justificar
-// sua presença).
+// Shell Anômalo dark-gold: rail + conteúdo sobre canvas preto. Marca Λ como
+// assinatura discreta no canto inferior direito.
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
 
@@ -36,9 +36,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <main className="flex-1 min-w-0">
         <div className="mx-auto w-full max-w-[1280px] px-md md:px-lg lg:px-xl py-2xl pt-16 lg:pt-2xl">
-          {children}
+          <Suspense fallback={null}>{children}</Suspense>
         </div>
       </main>
+
+      <AnomaloMark size={44} className="anomalo-mark" />
     </div>
   );
 }

@@ -1,28 +1,109 @@
 "use client";
 
-import { Plus, Tag } from "lucide-react";
+import { useState } from "react";
+import { Plus, Trash2 } from "lucide-react";
 import { Hero } from "@/components/sections/Hero";
+import { FinanceiroNav } from "@/components/financeiro/FinanceiroNav";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/feedback/EmptyState";
+import { toast } from "@/components/feedback/Toast";
+import { CategoriaDrawer } from "@/components/financeiro/CategoriaDrawer";
+import {
+  useCategoriasFinanceiras,
+  useExcluirCategoria,
+  type CategoriaRow,
+  type TipoFin,
+} from "@/lib/queries/financeiro";
 
-export default function CategoriasFinanceirasPage() {
+export default function CategoriasPage() {
+  const receitas = useCategoriasFinanceiras("entrada");
+  const despesas = useCategoriasFinanceiras("saida");
+  const excluir = useExcluirCategoria();
+
+  const [open, setOpen] = useState(false);
+  const [editar, setEditar] = useState<CategoriaRow | null>(null);
+  const [tipoNovo, setTipoNovo] = useState<TipoFin>("saida");
+
+  function nova(tipo: TipoFin) {
+    setEditar(null);
+    setTipoNovo(tipo);
+    setOpen(true);
+  }
+
+  function renderBloco(titulo: string, lista: CategoriaRow[]) {
+    return (
+      <Card className="p-lg flex flex-col gap-md">
+        <div className="flex items-center justify-between">
+          <h3 className="text-label-caps text-text-3">
+            {titulo} · {lista.length}
+          </h3>
+        </div>
+        {lista.length === 0 ? (
+          <p className="text-body-sm text-text-3">Nenhuma categoria.</p>
+        ) : (
+          lista.map((c) => (
+            <div
+              key={c.id}
+              className="flex items-center justify-between border-b border-border-thin py-2"
+            >
+              <button
+                className="flex items-center gap-3 text-left"
+                onClick={() => {
+                  setEditar(c);
+                  setOpen(true);
+                }}
+              >
+                <span
+                  className="h-3 w-3 rounded-sm"
+                  style={{ backgroundColor: c.cor ?? "#8a93a3" }}
+                />
+                <span className="text-body-md text-text-1">{c.nome}</span>
+              </button>
+              <Button
+                size="iconSm"
+                variant="ghost"
+                onClick={async () => {
+                  if (confirm("Excluir categoria?")) {
+                    try {
+                      await excluir.mutateAsync(c.id);
+                      toast.success("Excluída.");
+                    } catch (e) {
+                      toast.error(e instanceof Error ? e.message : "Falha.");
+                    }
+                  }
+                }}
+              >
+                <Trash2 size={16} />
+              </Button>
+            </div>
+          ))
+        )}
+      </Card>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-2xl">
       <Hero
-        eyebrow="Financeiro"
+        eyebrow="Financeiro · Categorias"
         titulo="Categorias"
-        descricao="Estrutura customizada de categorias de entrada e saída."
+        descricao="Organize lançamentos por categoria para DRE e relatórios."
         acoes={
-          <Button>
-            <Plus size={14} strokeWidth={1.8} />
-            Nova categoria
+          <Button onClick={() => nova("saida")}>
+            <Plus size={16} /> Nova categoria
           </Button>
         }
       />
-      <EmptyState
-        icone={Tag}
-        titulo="Crie sua primeira categoria."
-        descricao="Categorias organizam o DRE e os relatórios."
+      <FinanceiroNav />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-md">
+        {renderBloco("Receitas", receitas.data ?? [])}
+        {renderBloco("Despesas", despesas.data ?? [])}
+      </div>
+      <CategoriaDrawer
+        open={open}
+        onOpenChange={setOpen}
+        editar={editar}
+        tipoInicial={tipoNovo}
       />
     </div>
   );

@@ -25,6 +25,7 @@ import { toast } from "@/components/feedback/Toast";
 import { FORMAS_PAGAMENTO } from "@/lib/constants";
 import {
   useAtualizarLancamento,
+  useContas,
   useCriarLancamento,
   type LancamentoRow,
 } from "@/lib/queries/financeiro";
@@ -54,6 +55,7 @@ interface FormState {
   data_vencimento: string;
   forma_pagamento: string;
   categoria_id: string;
+  conta_id: string;
   status: "pendente" | "pago";
   observacoes: string;
 }
@@ -68,6 +70,7 @@ function emptyState(tipoInicial: "entrada" | "saida"): FormState {
     data_vencimento: "",
     forma_pagamento: "pix",
     categoria_id: "",
+    conta_id: "",
     status: "pendente",
     observacoes: "",
   };
@@ -83,6 +86,7 @@ function fromRow(row: LancamentoRow): FormState {
     data_vencimento: row.data_vencimento ?? "",
     forma_pagamento: row.forma_pagamento ?? "pix",
     categoria_id: row.categoria_id ?? "",
+    conta_id: row.conta_id ?? "",
     status: (row.status === "pago" ? "pago" : "pendente") as
       | "pendente"
       | "pago",
@@ -98,6 +102,7 @@ export function LancamentoDialog({
   editar,
 }: Props) {
   const [form, setForm] = useState<FormState>(emptyState(tipoInicial));
+  const contas = useContas();
   const criar = useCriarLancamento();
   const atualizar = useAtualizarLancamento();
   const isEdit = Boolean(editar);
@@ -126,6 +131,7 @@ export function LancamentoDialog({
         data_vencimento: form.data_vencimento || null,
         forma_pagamento: form.forma_pagamento || null,
         categoria_id: form.categoria_id || null,
+        conta_id: form.conta_id || null,
         status: form.status,
         observacoes: form.observacoes.trim() || null,
       };
@@ -302,10 +308,32 @@ export function LancamentoDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="pendente">Pendente</SelectItem>
-                  <SelectItem value="pago">Pago</SelectItem>
+                  <SelectItem value="pendente">Previsto</SelectItem>
+                  <SelectItem value="pago">Realizado</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-md">
+            <div className="flex flex-col gap-xs">
+              <Label htmlFor="conta_id">Conta</Label>
+              <select
+                id="conta_id"
+                className="glass-input"
+                value={form.conta_id}
+                onChange={(e) =>
+                  setForm({ ...form, conta_id: e.target.value })
+                }
+              >
+                <option value="">Sem conta</option>
+                {(contas.data ?? [])
+                  .filter((c) => c.ativa)
+                  .map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.nome}
+                    </option>
+                  ))}
+              </select>
             </div>
           </div>
           <div className="flex flex-col gap-xs">

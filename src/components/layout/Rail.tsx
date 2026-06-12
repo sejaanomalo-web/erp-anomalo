@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, LogOut, Pencil } from "lucide-react";
+import { LogOut, Pencil } from "lucide-react";
 import { AnomaloMark } from "@/components/brand/AnomaloMark";
 import { NAV } from "@/lib/navigation";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -14,11 +14,10 @@ interface RailProps {
   onToggle: () => void;
 }
 
-// Gmail-style sidebar:
-//   - Header com logo + toggle
-//   - "Compose pill" (CTA primária em pill, pale blue, sombra suave). No ERP, "Nova venda"
-//   - Nav-rail items: pill assimétrico no item ativo (bg compose pale blue, ícone preenchido),
-//     transparent + state layer hover nos inativos
+// Sidebar Anômalo dark-gold:
+//   - Topo: logo Λ. Clicar nele expande/recolhe o rail.
+//   - "Nova venda": pílula dourada (CTA primária).
+//   - Itens: ativo com barra dourada à esquerda + fundo surface-2 + ícone ouro.
 export function Rail({ collapsed, onToggle }: RailProps) {
   const pathname = usePathname();
   const router = useRouter();
@@ -36,7 +35,7 @@ export function Rail({ collapsed, onToggle }: RailProps) {
   return (
     <aside
       className={cn(
-        "hidden lg:flex flex-col h-screen sticky top-0 z-rail bg-background transition-[width] duration-medium",
+        "hidden lg:flex flex-col h-screen sticky top-0 z-rail bg-background border-r border-border-thin transition-[width] duration-medium",
       )}
       style={{
         width: collapsed
@@ -44,32 +43,28 @@ export function Rail({ collapsed, onToggle }: RailProps) {
           : "var(--rail-width)",
       }}
     >
-      {/* Header */}
-      <div className="flex items-center gap-2 px-3 h-16">
+      {/* Topo: logo Λ (clicar expande/recolhe) */}
+      <div className="flex items-center h-16 px-3">
         <button
           type="button"
           onClick={onToggle}
           aria-label={collapsed ? "Expandir menu" : "Recolher menu"}
-          className="h-10 w-10 inline-flex items-center justify-center rounded-full text-text-2 hover:bg-[var(--state-hover)] active:bg-[var(--state-pressed)] transition-colors duration-fast"
+          title={collapsed ? "Expandir menu" : "Recolher menu"}
+          className={cn(
+            "flex items-center gap-2 h-11 rounded-[10px] text-text-1 hover:bg-surface-2 transition-colors duration-fast",
+            collapsed ? "w-full justify-center" : "w-full px-2",
+          )}
         >
-          {collapsed ? (
-            <ChevronRight size={20} strokeWidth={2} />
-          ) : (
-            <ChevronLeft size={20} strokeWidth={2} />
+          <AnomaloMark size={22} className="text-accent" decorative={false} />
+          {collapsed ? null : (
+            <span className="text-h4 font-bold tracking-[0.12em] text-text-1">
+              ATON
+            </span>
           )}
         </button>
-        {collapsed ? null : (
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-text-1 font-semibold text-base tracking-[0.08em]"
-          >
-            <AnomaloMark size={18} className="text-accent" decorative={false} />
-            <span>TꓥTO ESTOFADOS</span>
-          </Link>
-        )}
       </div>
 
-      {/* Compose pill — CTA primária */}
+      {/* Nova venda — pílula dourada */}
       {podeNovaVenda ? (
         <div className="px-3 pb-3">
           <button
@@ -77,21 +72,23 @@ export function Rail({ collapsed, onToggle }: RailProps) {
             onClick={() => router.push("/vendas/nova")}
             title="Nova venda"
             className={cn(
-              "inline-flex items-center justify-start gap-3 h-14 bg-compose text-compose-foreground rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-fast",
-              collapsed ? "w-14 justify-center" : "w-full pl-4 pr-6",
+              "inline-flex items-center justify-start gap-3 h-12 bg-accent text-black rounded-[12px] shadow-[0_0_16px_rgba(201,149,58,0.12)] hover:brightness-110 hover:shadow-[0_0_24px_rgba(201,149,58,0.30)] transition-[filter,box-shadow] duration-fast",
+              collapsed ? "w-12 justify-center" : "w-full pl-4 pr-6",
             )}
           >
-            <Pencil size={20} strokeWidth={2} />
+            <Pencil size={18} strokeWidth={2.2} />
             {collapsed ? null : (
-              <span className="text-body-md font-medium">Nova venda</span>
+              <span className="text-button uppercase tracking-[0.075em] font-bold">
+                Nova venda
+              </span>
             )}
           </button>
         </div>
       ) : null}
 
-      {/* Nav-rail */}
-      <nav className="flex-1 overflow-y-auto scrollbar-thin pr-2">
-        <ul className="flex flex-col gap-[2px]">
+      {/* Navegação */}
+      <nav className="flex-1 overflow-y-auto scrollbar-thin px-3">
+        <ul className="flex flex-col gap-1">
           {items.map((item) => {
             const Icon = item.icon;
             const active =
@@ -103,22 +100,28 @@ export function Rail({ collapsed, onToggle }: RailProps) {
                   href={item.href}
                   title={collapsed ? item.label : undefined}
                   className={cn(
-                    "flex items-center gap-3 h-8 transition-colors duration-fast",
-                    // Nav-rail item: pill assimétrico ancorado à direita
-                    "rounded-r-full",
-                    collapsed ? "mx-2 px-2 rounded-full justify-center" : "pl-6 pr-6",
+                    "relative flex items-center gap-3 h-11 rounded-[10px] transition-colors duration-fast",
+                    collapsed ? "justify-center px-0" : "px-3",
                     active
-                      ? "bg-compose text-compose-foreground font-medium"
-                      : "text-text-2 hover:bg-[var(--state-hover)] active:bg-[var(--state-pressed)]",
+                      ? "bg-surface-2 text-text-1"
+                      : "text-text-2 hover:bg-surface-2",
                   )}
                 >
+                  {active ? (
+                    <span
+                      aria-hidden
+                      className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-[2px] bg-accent"
+                    />
+                  ) : null}
                   <Icon
                     size={20}
-                    strokeWidth={active ? 2.2 : 1.8}
-                    className={cn(active ? "text-compose-foreground" : "text-text-2")}
+                    strokeWidth={active ? 2 : 1.8}
+                    className={active ? "text-accent" : "text-text-2"}
                   />
                   {collapsed ? null : (
-                    <span className="text-body-md">{item.label}</span>
+                    <span className="text-body-md font-medium whitespace-nowrap overflow-hidden text-ellipsis">
+                      {item.label}
+                    </span>
                   )}
                 </Link>
               </li>
@@ -127,19 +130,21 @@ export function Rail({ collapsed, onToggle }: RailProps) {
         </ul>
       </nav>
 
-      {/* Sign out */}
-      <div className="p-2">
+      {/* Sair */}
+      <div className="p-3 border-t border-border-thin">
         <button
           type="button"
           onClick={sair}
           title={collapsed ? "Sair" : undefined}
           className={cn(
-            "flex items-center gap-3 h-10 w-full rounded-full text-text-2 hover:bg-[var(--state-hover)] active:bg-[var(--state-pressed)] transition-colors duration-fast",
-            collapsed ? "justify-center px-2" : "px-4",
+            "flex items-center gap-3 h-11 w-full rounded-[10px] text-text-2 hover:bg-surface-2 transition-colors duration-fast",
+            collapsed ? "justify-center px-0" : "px-3",
           )}
         >
           <LogOut size={18} strokeWidth={1.8} />
-          {collapsed ? null : <span className="text-body-md">Sair</span>}
+          {collapsed ? null : (
+            <span className="text-body-md font-medium">Sair</span>
+          )}
         </button>
       </div>
     </aside>

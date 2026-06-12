@@ -2,221 +2,517 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  /* Gmail / Material 3 light tokens — canvas cool-white com Google Blue como ação */
-  :root,
-  [data-theme="light"] {
-    --background: #f6f8fc;
-    --background-alt: #f0f4f9;
-    --surface-1: #ffffff;
-    --surface-2: #f0f4f9;
-    --surface-3: #e9eef6;
+/* ============================================================
+ * ATON ESTOFADOS — ERP · Design System (Anômalo dark-gold)
+ *
+ * Estética: preto absoluto (#000000) com ouro #C9953A como detalhe
+ * raro. Cards sólidos (preto fosco #0f0f12) com glow dourado discreto
+ * de 3 camadas. Hero-banner com fio dourado no topo. Fonte Inter.
+ * Cores semânticas explícitas (success/warning/danger) ao lado do ouro.
+ *
+ * Os nomes de token do ERP (--background, --surface-1/2/3, --text-1/2/3/4,
+ * --accent, --border-thin, --compose, --rail-width, etc.) são preservados
+ * e repontados para a paleta da marca — assim TODOS os módulos herdam o
+ * visual novo via Tailwind (bg-surface-1, text-text-2, ...) e via a classe
+ * .solid-surface, sem reescrever cada componente.
+ * ============================================================ */
+:root,
+[data-theme="dark"],
+[data-theme="light"] {
+  color-scheme: dark;
 
-    /* Dourado Tato (#C9953A) — primary action / focus / link */
-    --accent: #c9953a;
-    --accent-hover: #d3a14a;
-    --accent-active: #a57a24;
-    --accent-subtle: rgba(201, 149, 58, 0.08);
-    --accent-strong: rgba(201, 149, 58, 0.4);
+  /* Canvas + marca ---------------------------------------------------- */
+  --background: #000000;
+  --background-alt: #0f0f12;
+  --bg: #000000;
+  --fg: #ffffff;
 
-    /* M3 secondary container — Compose pill, active nav-rail (warm gold) */
-    --compose: #f5e0b0;
-    --compose-foreground: #4a370e;
+  --accent: #c9953a;
+  --accent-rgb: 201, 149, 58;
+  --accent-hover: #d8a64e;
+  --accent-active: #a57a24;
+  --accent-subtle: rgba(201, 149, 58, 0.10);
+  --accent-strong: rgba(201, 149, 58, 0.40);
+  --spectral: #ffffff;
+  --spectral-rgb: 255, 255, 255;
 
-    /* M3 primary container — selected row tint (pale warm gold) */
-    --selected: #f0e0ba;
-    --selected-foreground: #3d2a0a;
+  /* Surfaces (elevation por luminância) ------------------------------- */
+  --surface-1: #0f0f12; /* card padrão */
+  --surface-2: #16161b; /* hover / superfície elevada */
+  --surface-3: #1c1c22; /* input / drawer / modal */
 
-    --text-1: #1f1f1f;
-    --text-2: #444746;
-    --text-3: #5f6368;
-    --text-4: #80868b;
+  /* Texto (escala fechada) -------------------------------------------- */
+  --text-1: #ffffff; /* números, títulos */
+  --text-2: #c7cdd9; /* corpo, valores secundários */
+  --text-3: #8a93a3; /* labels, captions */
+  --text-4: #5b6473; /* placeholder, disabled */
 
-    --border-thin: #dadce0;
-    --border-medium: #c4c7c5;
-    --border-accent: rgba(201, 149, 58, 0.4);
+  /* "Compose" (Nova Venda) e linha selecionada — reaproveitados:
+   * a pílula de Nova Venda vira dourada; a linha selecionada, ouro suave. */
+  --compose: #c9953a;
+  --compose-foreground: #000000;
+  --selected: rgba(201, 149, 58, 0.12);
+  --selected-foreground: #ffffff;
 
-    --rail-width: 256px;
-    --rail-width-collapsed: 80px;
-    --row-height-inbox: 40px;
+  /* Bordas ------------------------------------------------------------ */
+  --border-thin: rgba(255, 255, 255, 0.06);
+  --border-medium: rgba(255, 255, 255, 0.10);
+  --border-accent: rgba(201, 149, 58, 0.40);
 
-    --success: #34a853;
-    --warning: #fbbc04;
-    --error: #ea4335;
-    --info: #4285f4;
+  /* Semântica de status ----------------------------------------------- */
+  --success: #16a34a;
+  --success-bg: rgba(22, 163, 74, 0.12);
+  --warning: #eab308;
+  --warning-bg: rgba(234, 179, 8, 0.12);
+  --error: #ef4444;
+  --danger: #ef4444;
+  --danger-bg: rgba(239, 68, 68, 0.12);
+  --info: #c9953a;
 
-    /* M3 state layers — overlay translúcido em hover/focus/pressed */
-    --state-hover: rgba(31, 31, 31, 0.04);
-    --state-focus: rgba(31, 31, 31, 0.08);
-    --state-pressed: rgba(31, 31, 31, 0.12);
+  /* State layers (hover/focus/pressed) -------------------------------- */
+  --state-hover: rgba(255, 255, 255, 0.05);
+  --state-focus: rgba(255, 255, 255, 0.08);
+  --state-pressed: rgba(255, 255, 255, 0.12);
 
-    color-scheme: light;
-  }
+  /* Rail --------------------------------------------------------------- */
+  --rail-width: 240px;
+  --rail-width-collapsed: 72px;
+  --row-height-inbox: 40px;
 
-  /* Dark — M3 dark surface ladder + Google Blue dark variant */
-  [data-theme="dark"] {
-    --background: #1f1f1f;
-    --background-alt: #1a1a1a;
-    --surface-1: #2d2d2d;
-    --surface-2: #282828;
-    --surface-3: #333333;
+  /* Aliases dos primitivos (card / input / header) -------------------- */
+  --card-bg: var(--surface-1);
+  --card-border: var(--border-thin);
+  --card-border-hover: rgba(201, 149, 58, 0.28);
+  --card-fg: var(--text-1);
+  --header-bg: rgba(0, 0, 0, 0.85);
+  --header-border: var(--border-thin);
+  --input-bg: var(--surface-3);
+  --input-border: var(--border-medium);
+  --divider: rgba(255, 255, 255, 0.06);
+  --selection-bg: #c9953a;
+  --selection-fg: #000000;
 
-    --accent: #e5be6b;
-    --accent-hover: #f2d188;
-    --accent-active: #c9a24f;
-    --accent-subtle: rgba(229, 190, 107, 0.1);
-    --accent-strong: rgba(229, 190, 107, 0.4);
+  /* Aliases estilo shadcn para o módulo Financeiro -------------------- */
+  --primary: var(--accent);
+  --primary-foreground: #000000;
+  --primary-hover: #b07f25;
+  --primary-rgb: 201, 149, 58;
+  --secondary: var(--surface-2);
+  --secondary-foreground: var(--text-1);
+  --foreground: var(--fg);
+  --muted: var(--surface-2);
+  --muted-foreground: var(--text-3);
+  --popover: var(--surface-1);
+  --popover-foreground: var(--text-1);
+  --border: var(--border-thin);
+  --ring: var(--accent);
+  --destructive: var(--danger);
+  --destructive-bg: var(--danger-bg);
+  --card: var(--surface-1);
+  --card-foreground: var(--text-1);
+  --input: var(--surface-3);
+  --input-fg: var(--fg);
+}
 
-    --compose: #3a2a0a;
-    --compose-foreground: #f5e0b0;
+html,
+body {
+  background: var(--bg);
+  color: var(--fg);
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  touch-action: manipulation;
+}
 
-    --selected: #2a1f0a;
-    --selected-foreground: #f0e0ba;
+html {
+  background: var(--background);
+}
 
-    --text-1: #e3e3e3;
-    --text-2: #bdc1c6;
-    --text-3: #9aa0a6;
-    --text-4: #80868b;
+body {
+  background: var(--background);
+  color: var(--text-1);
+  font-family: var(--font-inter), "Inter", ui-sans-serif, system-ui,
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+  font-weight: 400;
+  font-feature-settings: "ss01", "cv11", "tnum";
+  letter-spacing: 0;
+  min-height: 100vh;
+  overflow-x: clip;
+}
 
-    --border-thin: #3c4043;
-    --border-medium: #5f6368;
-    --border-accent: rgba(229, 190, 107, 0.4);
+* {
+  border-color: var(--border-thin);
+}
 
-    --state-hover: rgba(255, 255, 255, 0.05);
-    --state-focus: rgba(255, 255, 255, 0.08);
-    --state-pressed: rgba(255, 255, 255, 0.12);
+/* ============================================================
+ * Tipografia — hierarquia por tamanho/peso, sentence case.
+ * Uppercase fica reservado às utilitárias .ds-label/.ds-nav/
+ * .ds-caption/.ds-micro (chips, status, breadcrumbs, badges) e
+ * aos botões .btn-* / .ds-btn.
+ * ============================================================ */
+h1, h2, h3, h4, h5, h6,
+.ds-display, .ds-headline {
+  font-family: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--text-1);
+  text-transform: none;
+}
 
-    color-scheme: dark;
-  }
+h1, .ds-display { font-size: 32px; letter-spacing: -0.02em; line-height: 1.1; }
+h2 { font-size: 24px; letter-spacing: -0.015em; }
+h3 { font-size: 20px; letter-spacing: -0.01em; font-weight: 600; }
+h4 { font-size: 16px; font-weight: 600; }
+h5 { font-size: 14px; font-weight: 600; }
+h6 { font-size: 13px; font-weight: 600; }
 
-  * {
-    border-color: var(--border-thin);
-  }
+.ds-label {
+  font-family: var(--font-inter), "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 1.17px;
+  text-transform: uppercase;
+}
+.ds-nav {
+  font-family: var(--font-inter), "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 0.94;
+  letter-spacing: 1.17px;
+  text-transform: uppercase;
+}
+.ds-caption {
+  font-family: var(--font-inter), "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.ds-micro {
+  font-family: var(--font-inter), "Inter", sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 0.94;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.ds-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.45;
+}
 
-  html {
-    background: var(--background);
-    color: var(--text-1);
-    -webkit-text-size-adjust: 100%;
-  }
+::selection {
+  background: var(--selection-bg);
+  color: var(--selection-fg);
+}
 
-  body {
-    background: var(--background);
-    color: var(--text-1);
-    font-family: var(--font-roboto), Roboto, system-ui, sans-serif;
-    font-feature-settings: "kern", "liga", "tnum";
-    min-height: 100vh;
-    overflow-x: clip;
-  }
+input,
+select,
+button,
+textarea {
+  font-family: inherit;
+  touch-action: manipulation;
+}
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    font-family: var(--font-roboto), Roboto, system-ui, sans-serif;
-    letter-spacing: 0;
-    text-transform: none;
-  }
-
-  ::selection {
-    background: var(--accent-subtle);
-    color: var(--text-1);
-  }
-
-  @media (max-width: 768px) {
-    input,
-    select,
-    textarea {
-      font-size: 16px !important;
-    }
+/* iOS: evita auto-zoom em inputs (mínimo 16px) */
+@media screen and (max-width: 768px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
   }
 }
 
-@layer components {
-  /* Card padrão do Gmail: branco com borda fininha, rounded 12. */
+table {
+  border-collapse: collapse;
+}
+
+/* ============================================================
+ * Card primitive — .solid-surface (nome legado do ERP) e .glass
+ * são equivalentes: preto fosco, raio 16px, borda fina + glow
+ * dourado discreto de 3 camadas. Hover: glow mais forte + borda ouro.
+ * Como TODO card do ERP usa .solid-surface, o visual novo se propaga.
+ * ============================================================ */
+.solid-surface,
+.glass {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  color: var(--card-fg);
+  box-shadow:
+    0 0 0 1px rgba(201, 149, 58, 0.03),
+    0 2px 24px rgba(201, 149, 58, 0.04),
+    0 1px 0 rgba(255, 255, 255, 0.02) inset;
+  transition: transform 0.22s cubic-bezier(0.22, 0.61, 0.36, 1),
+    background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.25s ease;
+}
+
+.solid-surface-hover:hover,
+.glass-hover:hover {
+  background: var(--surface-2);
+  border-color: var(--card-border-hover);
+  box-shadow:
+    0 0 0 1px rgba(201, 149, 58, 0.10),
+    0 4px 36px rgba(201, 149, 58, 0.10),
+    0 1px 0 rgba(255, 255, 255, 0.04) inset;
+}
+
+@media (hover: hover) {
+  .glass-input:hover {
+    border-color: rgba(201, 149, 58, 0.4);
+  }
+  table tbody tr {
+    transition: background-color 0.15s ease;
+  }
+}
+
+/* ============================================================
+ * Hero banner — cabeçalho premium de cada página (Dashboard,
+ * Financeiro, Vendas, ...). Fundo ouro-sobre-preto com brilho
+ * discreto e fio dourado no topo. Substitui o header solto.
+ * ============================================================ */
+.hero-banner {
+  position: relative;
+  border-radius: 18px;
+  padding: 26px 30px;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      120% 160% at 0% 0%,
+      rgba(201, 149, 58, 0.16),
+      rgba(201, 149, 58, 0.03) 42%,
+      transparent 70%
+    ),
+    linear-gradient(135deg, rgba(201, 149, 58, 0.1), rgba(0, 0, 0, 0) 58%),
+    var(--surface-1);
+  border: 1px solid rgba(201, 149, 58, 0.24);
+  box-shadow:
+    0 0 0 1px rgba(201, 149, 58, 0.04) inset,
+    0 10px 44px rgba(201, 149, 58, 0.09),
+    0 1px 0 rgba(255, 255, 255, 0.03) inset;
+}
+.hero-banner::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(201, 149, 58, 0.75),
+    transparent
+  );
+}
+
+/* ============================================================
+ * Input primitive — .glass-input
+ * ============================================================ */
+.glass-input {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 10px;
+  color: var(--fg);
+  outline: none;
+  transition: border-color 0.2s ease;
+  padding: 10px 14px;
+}
+.glass-input:focus {
+  border-color: rgba(var(--spectral-rgb), 0.55);
+}
+
+/* ============================================================
+ * Botões dourados (CTAs). Raio 10px, uppercase com tracking.
+ * ============================================================ */
+.ds-btn,
+.btn-gold-filled,
+.btn-gold-outline,
+.btn-gold-solid,
+.btn-ghost {
+  text-transform: uppercase;
+  letter-spacing: 1.17px;
+  font-weight: 600;
+}
+
+.btn-gold-filled {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--accent);
+  color: #000;
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  padding: 12px 22px;
+  font-family: var(--font-inter), "Inter", sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  box-shadow: 0 0 16px rgba(201, 149, 58, 0.12);
+  cursor: pointer;
+  transition: filter 0.2s ease, box-shadow 0.2s ease;
+}
+.btn-gold-filled:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 0 24px rgba(201, 149, 58, 0.30);
+}
+
+.btn-gold-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid rgba(var(--accent-rgb), 0.4);
+  color: var(--accent);
+  border-radius: 10px;
+  padding: 12px 22px;
+  font-family: var(--font-inter), "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.btn-gold-outline:hover {
+  background: rgba(var(--accent-rgb), 0.10);
+  border-color: rgba(var(--accent-rgb), 0.65);
+  box-shadow: 0 0 16px rgba(201, 149, 58, 0.18);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(var(--accent-rgb), 0.10);
+  color: var(--accent);
+  border: 1px solid rgba(var(--accent-rgb), 0.35);
+  border-radius: 10px;
+  padding: 12px 22px;
+  font-family: var(--font-inter), "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.btn-ghost:hover {
+  background: rgba(var(--accent-rgb), 0.18);
+  border-color: rgba(var(--accent-rgb), 0.6);
+  box-shadow: 0 0 16px rgba(201, 149, 58, 0.18);
+}
+
+/* ============================================================
+ * Helpers
+ * ============================================================ */
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text-3);
+}
+
+.gold-divider {
+  width: 64px;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    rgba(201, 149, 58, 0.85) 0%,
+    rgba(201, 149, 58, 0.6) 35%,
+    rgba(201, 149, 58, 0) 100%
+  );
+  border-radius: 2px;
+  box-shadow: 0 0 12px rgba(201, 149, 58, 0.25);
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.glass-header {
+  background: var(--header-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--header-border);
+}
+
+.divider-h { height: 0.5px; background: var(--divider); }
+.divider-v { width: 0.5px; background: var(--divider); }
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--spectral-rgb), 0.2) transparent;
+}
+.scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(var(--spectral-rgb), 0.2);
+  border-radius: 9999px;
+}
+.scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+
+/* M3 state layer — overlay translúcido on-surface */
+.state-layer {
+  transition: background-color 150ms ease;
+}
+.state-layer:hover { background-color: var(--state-hover); }
+.state-layer:focus-visible { background-color: var(--state-focus); outline: none; }
+.state-layer:active { background-color: var(--state-pressed); }
+
+.focus-ring {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+/* Marca d'água Λ no canto inferior direito do app shell */
+.anomalo-mark {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 30;
+  opacity: 0.08;
+  pointer-events: none;
+  color: var(--accent);
+}
+
+/* ============================================================
+ * Print — usado pelo botão "Exportar PDF" do Financeiro/Relatórios.
+ * Fundo branco, tinta preta, esconde navegação/sino/botões.
+ * ============================================================ */
+@media print {
+  aside,
+  .sino-trigger,
+  .no-print {
+    display: none !important;
+  }
+  html,
+  body,
+  .glass,
+  .solid-surface,
+  .hero-banner,
+  .glass-header {
+    background: #ffffff !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+    border-color: #d5d5d5 !important;
+  }
+  main {
+    margin-left: 0 !important;
+    padding: 16mm !important;
+  }
+  .glass,
   .solid-surface {
-    background: var(--surface-1);
-    border: 1px solid var(--border-thin);
-    border-radius: 12px;
-    transition: background-color 150ms cubic-bezier(0.2, 0, 0, 1),
-      box-shadow 150ms cubic-bezier(0.2, 0, 0, 1);
+    border: 1px solid #d5d5d5 !important;
+    border-radius: 8px !important;
+    page-break-inside: avoid;
   }
-
-  .solid-surface-hover:hover {
-    background-color: var(--surface-2);
-    box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.1);
-  }
-
-  /* Divisor neutro (substitui o gold-divider antigo) */
-  .gold-divider {
-    width: 64px;
-    height: 1px;
-    background: var(--border-thin);
-  }
-
-  .eyebrow {
-    font-size: 0.75rem;
-    font-weight: 500;
-    letter-spacing: 0.025em;
-    color: var(--text-3);
-  }
-
-  .tabular-nums {
-    font-variant-numeric: tabular-nums;
-  }
-
-  .scrollbar-thin {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(60, 64, 67, 0.2) transparent;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: rgba(60, 64, 67, 0.2);
-    border-radius: 9999px;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  /* M3 state layer — overlay translúcido on-surface @ 4% / 8% / 12% */
-  .state-layer {
-    transition: background-color 150ms cubic-bezier(0.2, 0, 0, 1);
-  }
-
-  .state-layer:hover {
-    background-color: var(--state-hover);
-  }
-
-  .state-layer:focus-visible {
-    background-color: var(--state-focus);
-    outline: none;
-  }
-
-  .state-layer:active {
-    background-color: var(--state-pressed);
-  }
-}
-
-@layer utilities {
-  .anomalo-mark {
-    position: fixed;
-    bottom: 16px;
-    right: 16px;
-    z-index: 30;
-    opacity: 0.32;
-    pointer-events: none;
-    color: var(--accent);
-  }
-
-  .focus-ring {
-    outline: none;
-    box-shadow: 0 0 0 2px var(--accent);
-  }
+  h1, h2, h3, h4, h5, h6, p, span, td, th, div { color: #000 !important; }
+  section { page-break-inside: avoid; }
+  table { border-collapse: collapse !important; width: 100% !important; }
+  th, td { border-color: #d5d5d5 !important; }
+  .gold-divider { background: transparent !important; box-shadow: none !important; }
 }

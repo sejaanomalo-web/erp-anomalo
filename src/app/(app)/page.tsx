@@ -24,6 +24,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { VendaStatusBadge } from "@/components/tables/StatusBadge";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { usePeriodo } from "@/hooks/usePeriodo";
 import {
   useDashboardAlertas,
   useDashboardKpis,
@@ -32,7 +33,8 @@ import {
 } from "@/lib/queries/dashboard";
 
 export default function DashboardPage() {
-  const kpis = useDashboardKpis();
+  const { periodo } = usePeriodo();
+  const kpis = useDashboardKpis(periodo.de, periodo.ate);
   const faturamento = useFaturamentoSerie();
   const proximas = useProximasEntregas();
   const alertas = useDashboardAlertas();
@@ -41,7 +43,7 @@ export default function DashboardPage() {
     <div className="flex flex-col gap-3xl">
       <Hero
         eyebrow="Visão geral"
-        titulo="Dashboard"
+        titulo={`Dashboard · ${periodo.rotulo}`}
         descricao="Resumo do que está em jogo agora."
       />
 
@@ -56,7 +58,7 @@ export default function DashboardPage() {
         ) : (
           <>
             <KPICard
-              label="Faturamento do mês"
+              label="Faturamento do período"
               valor={kpis.data?.faturamentoMes ?? 0}
               formato="moeda"
               icone={<Wallet size={16} strokeWidth={1.8} />}

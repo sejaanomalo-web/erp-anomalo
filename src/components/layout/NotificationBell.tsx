@@ -33,8 +33,10 @@ export function NotificationBell() {
         aria-label={`${unread} notificações não lidas`}
         onClick={() => setOpen(true)}
         className={cn(
-          "fixed right-md top-md z-topbar h-10 w-10 flex items-center justify-center bg-surface-1 border text-text-1 transition-colors duration-fast",
-          hasUnread ? "border-[var(--accent-strong)] text-accent" : "border-border-thin",
+          "fixed right-md top-md z-topbar h-11 w-11 flex items-center justify-center rounded-[12px] border text-text-2 backdrop-blur-md transition-colors duration-fast hover:text-text-1",
+          hasUnread
+            ? "border-[var(--accent-strong)] text-accent bg-[rgba(20,20,20,0.7)]"
+            : "border-border-thin bg-[rgba(20,20,20,0.7)]",
         )}
       >
         {hasUnread ? <BellRing size={18} strokeWidth={1.8} /> : <Bell size={18} strokeWidth={1.8} />}
