@@ -25,15 +25,23 @@ import {
 } from "@/lib/constants";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { useDebounce } from "@/hooks/useDebounce";
+import { usePeriodo } from "@/hooks/usePeriodo";
 import { useVendas, type VendaListRow } from "@/lib/queries/vendas";
 import type { VendaStatus, VendaTipo } from "@/types/database.types";
 
 export default function VendasPage() {
+  const { periodo } = usePeriodo();
   const [busca, setBusca] = useState("");
   const [status, setStatus] = useState<VendaStatus | "todos">("todos");
   const [tipo, setTipo] = useState<VendaTipo | "todos">("todos");
   const buscaDebounced = useDebounce(busca, 200);
-  const vendas = useVendas({ status, tipo, busca: buscaDebounced });
+  const vendas = useVendas({
+    status,
+    tipo,
+    busca: buscaDebounced,
+    inicio: periodo.de,
+    fim: periodo.ate,
+  });
 
   const columns: DataTableColumn<VendaListRow>[] = [
     {
