@@ -5,11 +5,11 @@ import { Rail } from "./Rail";
 import { MobileDrawer } from "./MobileDrawer";
 import { NotificationBell } from "./NotificationBell";
 import { CommandPaletteTrigger } from "./CommandPaletteTrigger";
-import { AnomaloMark } from "@/components/brand/AnomaloMark";
+import { TatoLogo } from "@/components/brand/TatoLogo";
 
 const STORAGE_KEY = "erp-anomalo:rail-collapsed";
 
-// Shell Anômalo dark-gold: rail + conteúdo sobre canvas preto. Marca Λ como
+// Shell TATO: rail + conteúdo sobre o canvas do tema. Logo TATO como
 // assinatura discreta no canto inferior direito.
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -40,7 +40,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </main>
 
-      <AnomaloMark size={44} className="anomalo-mark" />
+      <div className="anomalo-mark">
+        <TatoLogo height={30} />
+      </div>
     </div>
   );
 }

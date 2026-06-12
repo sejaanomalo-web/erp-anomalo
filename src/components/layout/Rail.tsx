@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { LogOut, Pencil } from "lucide-react";
-import { AnomaloMark } from "@/components/brand/AnomaloMark";
+import { TatoLogo } from "@/components/brand/TatoLogo";
 import { NAV } from "@/lib/navigation";
 import { usePermissions } from "@/hooks/usePermissions";
 import { cn } from "@/lib/utils";
@@ -55,12 +55,7 @@ export function Rail({ collapsed, onToggle }: RailProps) {
             collapsed ? "w-full justify-center" : "w-full px-2",
           )}
         >
-          <AnomaloMark size={22} className="text-accent" decorative={false} />
-          {collapsed ? null : (
-            <span className="text-h4 font-bold tracking-[0.12em] text-text-1">
-              ATON
-            </span>
-          )}
+          <TatoLogo height={collapsed ? 14 : 22} />
         </button>
       </div>
 
@@ -72,7 +67,7 @@ export function Rail({ collapsed, onToggle }: RailProps) {
             onClick={() => router.push("/vendas/nova")}
             title="Nova venda"
             className={cn(
-              "inline-flex items-center justify-start gap-3 h-12 bg-accent text-black rounded-[12px] shadow-[0_0_16px_rgba(201,149,58,0.12)] hover:brightness-110 hover:shadow-[0_0_24px_rgba(201,149,58,0.30)] transition-[filter,box-shadow] duration-fast",
+              "inline-flex items-center justify-start gap-3 h-12 bg-accent text-[var(--on-accent)] rounded-[12px] shadow-[0_0_16px_rgba(var(--accent-rgb),0.12)] hover:brightness-110 hover:shadow-[0_0_24px_rgba(var(--accent-rgb),0.30)] transition-[filter,box-shadow] duration-fast",
               collapsed ? "w-12 justify-center" : "w-full pl-4 pr-6",
             )}
           >

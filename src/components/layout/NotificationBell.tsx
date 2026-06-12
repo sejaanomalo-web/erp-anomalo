@@ -41,7 +41,7 @@ export function NotificationBell() {
       >
         {hasUnread ? <BellRing size={18} strokeWidth={1.8} /> : <Bell size={18} strokeWidth={1.8} />}
         {hasUnread ? (
-          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-xs flex items-center justify-center bg-accent text-black text-caption font-bold rounded-full tabular-nums">
+          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-xs flex items-center justify-center bg-accent text-[var(--on-accent)] text-caption font-bold rounded-full tabular-nums">
             {unread > 99 ? "99+" : unread}
           </span>
         ) : null}

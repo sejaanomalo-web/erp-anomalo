@@ -48,29 +48,29 @@ export function GraficoFluxoCaixa({ dados }: { dados: FluxoMes[] }) {
       <ComposedChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
         <CartesianGrid
           vertical={false}
-          stroke="rgba(255,255,255,0.06)"
+          stroke="var(--divider)"
           strokeDasharray="2 4"
         />
         <XAxis
           dataKey="mes"
           axisLine={false}
           tickLine={false}
-          tick={{ fill: "#8a93a3", fontSize: 11 }}
+          tick={{ fill: "var(--text-3)", fontSize: 11 }}
         />
         <YAxis
           axisLine={false}
           tickLine={false}
           width={48}
-          tick={{ fill: "#8a93a3", fontSize: 11 }}
+          tick={{ fill: "var(--text-3)", fontSize: 11 }}
           tickFormatter={fmtK}
         />
         <Tooltip
-          cursor={{ fill: "rgba(201,149,58,0.08)" }}
+          cursor={{ fill: "rgba(var(--accent-rgb),0.08)" }}
           contentStyle={{
-            background: "#16161b",
+            background: "var(--surface-2)",
             border: "1px solid rgba(255,255,255,0.10)",
             borderRadius: 10,
-            color: "#fff",
+            color: "var(--text-1)",
             fontSize: 12,
           }}
           formatter={(value: number, name: string) => [formatCurrency(value), name]}
@@ -80,9 +80,9 @@ export function GraficoFluxoCaixa({ dados }: { dados: FluxoMes[] }) {
         <Line
           type="monotone"
           dataKey="Resultado"
-          stroke="#C9953A"
+          stroke="var(--accent)"
           strokeWidth={2}
-          dot={{ r: 3, fill: "#C9953A", stroke: "#0f0f12" }}
+          dot={{ r: 3, fill: "var(--accent)", stroke: "var(--surface-1)" }}
           activeDot={{ r: 5 }}
         />
       </ComposedChart>

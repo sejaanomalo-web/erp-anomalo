@@ -34,7 +34,7 @@ export default function FinanceiroPage() {
       <Hero
         eyebrow="Financeiro"
         titulo={`Caixa · ${periodo.rotulo}`}
-        descricao="Receitas, despesas, recorrentes e fluxo de caixa da Aton."
+        descricao="Receitas, despesas, recorrentes e fluxo de caixa da Tato."
       />
 
       <FinanceiroNav />
@@ -90,7 +90,7 @@ export default function FinanceiroPage() {
         <Card className="p-lg flex flex-col gap-md">
           <div className="flex items-start justify-between">
             <span className="text-body-sm text-text-3">Resultado</span>
-            <span className="rounded-full bg-[rgba(201,149,58,0.12)] p-2 text-accent">
+            <span className="rounded-full bg-[rgba(var(--accent-rgb),0.12)] p-2 text-accent">
               <Scale size={16} />
             </span>
           </div>

@@ -15,12 +15,12 @@ const buttonVariants = cva(
       variant: {
         // CTA principal = ouro preenchido com texto preto + glow dourado.
         default:
-          "bg-accent text-black border border-accent shadow-[0_0_16px_rgba(201,149,58,0.12)] hover:brightness-110 hover:shadow-[0_0_24px_rgba(201,149,58,0.30)]",
+          "bg-accent text-[var(--on-accent)] border border-accent shadow-[0_0_16px_rgba(var(--accent-rgb),0.12)] hover:brightness-110 hover:shadow-[0_0_24px_rgba(var(--accent-rgb),0.30)]",
         // "Nova venda" usa o mesmo ouro preenchido.
         compose:
-          "bg-accent text-black border border-accent shadow-[0_0_16px_rgba(201,149,58,0.12)] hover:brightness-110 hover:shadow-[0_0_24px_rgba(201,149,58,0.30)]",
+          "bg-accent text-[var(--on-accent)] border border-accent shadow-[0_0_16px_rgba(var(--accent-rgb),0.12)] hover:brightness-110 hover:shadow-[0_0_24px_rgba(var(--accent-rgb),0.30)]",
         outline:
-          "border border-[rgba(201,149,58,0.4)] text-accent bg-transparent hover:bg-[rgba(201,149,58,0.10)] hover:border-[rgba(201,149,58,0.65)] hover:shadow-[0_0_16px_rgba(201,149,58,0.18)]",
+          "border border-[rgba(var(--accent-rgb),0.4)] text-accent bg-transparent hover:bg-[rgba(var(--accent-rgb),0.10)] hover:border-[rgba(var(--accent-rgb),0.65)] hover:shadow-[0_0_16px_rgba(var(--accent-rgb),0.18)]",
         ghost:
           "bg-transparent text-text-2 normal-case font-medium tracking-normal hover:bg-[var(--state-hover)] hover:text-text-1 active:bg-[var(--state-pressed)]",
         secondary:

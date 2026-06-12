@@ -86,7 +86,7 @@ export default function LancamentosPage() {
             className={cn(
               "rounded-lg border px-3 py-1.5 text-label-caps transition-colors",
               chip === c.id
-                ? "bg-accent text-black border-accent"
+                ? "bg-accent text-[var(--on-accent)] border-accent"
                 : "border-border-thin text-text-3 hover:text-text-1",
             )}
           >

@@ -32,7 +32,7 @@ export function FinanceiroNav() {
             href={qs ? `${t.href}?${qs}` : t.href}
             className={cn(
               "whitespace-nowrap rounded-lg px-4 py-2 text-label-caps transition-colors duration-fast",
-              active ? "bg-accent text-black" : "text-text-2 hover:text-text-1",
+              active ? "bg-accent text-[var(--on-accent)]" : "text-text-2 hover:text-text-1",
             )}
           >
             {t.label}

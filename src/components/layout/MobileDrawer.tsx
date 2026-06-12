@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Menu, X, LogOut, Pencil } from "lucide-react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { useState } from "react";
-import { AnomaloMark } from "@/components/brand/AnomaloMark";
+import { TatoLogo } from "@/components/brand/TatoLogo";
 import { NAV } from "@/lib/navigation";
 import { usePermissions } from "@/hooks/usePermissions";
 import { cn } from "@/lib/utils";
@@ -44,9 +44,8 @@ export function MobileDrawer() {
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="left" className="p-0 bg-background" hideClose>
           <div className="flex items-center justify-between gap-2 px-4 h-16">
-            <div className="flex items-center gap-2 text-text-1 font-bold text-base tracking-[0.12em]">
-              <AnomaloMark size={22} className="text-accent" decorative={false} />
-              ATON ESTOFADOS
+            <div className="flex items-center">
+              <TatoLogo height={22} />
             </div>
             <button
               type="button"
@@ -66,7 +65,7 @@ export function MobileDrawer() {
                   setOpen(false);
                   router.push("/vendas/nova");
                 }}
-                className="inline-flex items-center justify-start gap-3 h-12 w-full pl-4 pr-6 bg-accent text-black rounded-[12px] shadow-[0_0_16px_rgba(201,149,58,0.12)]"
+                className="inline-flex items-center justify-start gap-3 h-12 w-full pl-4 pr-6 bg-accent text-[var(--on-accent)] rounded-[12px] shadow-[0_0_16px_rgba(var(--accent-rgb),0.12)]"
               >
                 <Pencil size={18} strokeWidth={2.2} />
                 <span className="text-button uppercase tracking-[0.075em] font-bold">

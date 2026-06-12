@@ -14,7 +14,7 @@ export function ToastViewport() {
           title: "!text-body-md !text-text-1 !font-medium",
           description: "!text-body-sm !text-text-3",
           actionButton:
-            "!bg-accent !text-black !rounded-none !uppercase !text-button !tracking-[0.075em]",
+            "!bg-accent !text-[var(--on-accent)] !rounded-none !uppercase !text-button !tracking-[0.075em]",
           cancelButton:
             "!bg-surface-2 !text-text-2 !rounded-none !uppercase !text-button !tracking-[0.075em]",
         },

@@ -99,7 +99,7 @@ export async function POST(_request: NextRequest) {
         accessToken: accessToken!,
         calendarId: (token.calendar_id as string | null) ?? "primary",
         event: {
-          summary: `Entrega Aton #${venda.numero}`,
+          summary: `Entrega Tato #${venda.numero}`,
           description: `Entrega prevista da venda #${venda.numero}`,
           start: { dateTime: inicio, timeZone: "America/Sao_Paulo" },
           end: { dateTime: fim, timeZone: "America/Sao_Paulo" },

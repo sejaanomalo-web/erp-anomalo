@@ -3,100 +3,92 @@
 @tailwind utilities;
 
 /* ============================================================
- * ATON ESTOFADOS — ERP · Design System (Anômalo dark-gold)
+ * TATO — ERP · Design System (marrom + bege)
  *
- * Estética: preto absoluto (#000000) com ouro #C9953A como detalhe
- * raro. Cards sólidos (preto fosco #0f0f12) com glow dourado discreto
- * de 3 camadas. Hero-banner com fio dourado no topo. Fonte Inter.
- * Cores semânticas explícitas (success/warning/danger) ao lado do ouro.
+ * Duas cores principais que se invertem entre tema escuro e claro:
+ *   ESCURO  -> fundo #361908 (marrom), contraste #E6D6C8 (bege)
+ *   CLARO   -> fundo #E6D6C8 (bege),  contraste #361908 (marrom)
+ * Branco (#ffffff) é a terceira cor, para detalhes.
  *
  * Os nomes de token do ERP (--background, --surface-1/2/3, --text-1/2/3/4,
- * --accent, --border-thin, --compose, --rail-width, etc.) são preservados
- * e repontados para a paleta da marca — assim TODOS os módulos herdam o
- * visual novo via Tailwind (bg-surface-1, text-text-2, ...) e via a classe
- * .solid-surface, sem reescrever cada componente.
+ * --accent, --border-thin, --compose, --rail-width, etc.) são preservados —
+ * todos os módulos herdam o visual via Tailwind e via .solid-surface.
+ * --on-accent = cor de texto/ícone SOBRE o accent (= a cor de fundo do tema).
+ * --logo-color = cor do logo (branco no escuro, marrom no claro).
  * ============================================================ */
+
+/* ---------- ESCURO (fundo marrom, contraste bege) ---------- */
 :root,
-[data-theme="dark"],
-[data-theme="light"] {
+[data-theme="dark"] {
   color-scheme: dark;
 
-  /* Canvas + marca ---------------------------------------------------- */
-  --background: #000000;
-  --background-alt: #0f0f12;
-  --bg: #000000;
+  --background: #361908;
+  --background-alt: #2b1306;
+  --bg: #361908;
   --fg: #ffffff;
 
-  --accent: #c9953a;
-  --accent-rgb: 201, 149, 58;
-  --accent-hover: #d8a64e;
-  --accent-active: #a57a24;
-  --accent-subtle: rgba(201, 149, 58, 0.10);
-  --accent-strong: rgba(201, 149, 58, 0.40);
+  --accent: #e6d6c8;
+  --accent-rgb: 230, 214, 200;
+  --accent-hover: #efe2d8;
+  --accent-active: #d4c0ad;
+  --accent-subtle: rgba(230, 214, 200, 0.12);
+  --accent-strong: rgba(230, 214, 200, 0.40);
+  --on-accent: #361908;
+  --logo-color: #ffffff;
   --spectral: #ffffff;
   --spectral-rgb: 255, 255, 255;
 
-  /* Surfaces (elevation por luminância) ------------------------------- */
-  --surface-1: #0f0f12; /* card padrão */
-  --surface-2: #16161b; /* hover / superfície elevada */
-  --surface-3: #1c1c22; /* input / drawer / modal */
+  --surface-1: #432310; /* card */
+  --surface-2: #50301a; /* hover */
+  --surface-3: #5c3a22; /* input */
 
-  /* Texto (escala fechada) -------------------------------------------- */
-  --text-1: #ffffff; /* números, títulos */
-  --text-2: #c7cdd9; /* corpo, valores secundários */
-  --text-3: #8a93a3; /* labels, captions */
-  --text-4: #5b6473; /* placeholder, disabled */
+  --text-1: #ffffff;
+  --text-2: #ece1d6;
+  --text-3: #c3b2a2;
+  --text-4: #927a64;
 
-  /* "Compose" (Nova Venda) e linha selecionada — reaproveitados:
-   * a pílula de Nova Venda vira dourada; a linha selecionada, ouro suave. */
-  --compose: #c9953a;
-  --compose-foreground: #000000;
-  --selected: rgba(201, 149, 58, 0.12);
+  --compose: var(--accent);
+  --compose-foreground: var(--on-accent);
+  --selected: rgba(230, 214, 200, 0.12);
   --selected-foreground: #ffffff;
 
-  /* Bordas ------------------------------------------------------------ */
-  --border-thin: rgba(255, 255, 255, 0.06);
-  --border-medium: rgba(255, 255, 255, 0.10);
-  --border-accent: rgba(201, 149, 58, 0.40);
+  --border-thin: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.14);
+  --border-accent: rgba(230, 214, 200, 0.40);
 
-  /* Semântica de status ----------------------------------------------- */
   --success: #16a34a;
-  --success-bg: rgba(22, 163, 74, 0.12);
+  --success-bg: rgba(22, 163, 74, 0.16);
   --warning: #eab308;
-  --warning-bg: rgba(234, 179, 8, 0.12);
+  --warning-bg: rgba(234, 179, 8, 0.16);
   --error: #ef4444;
   --danger: #ef4444;
-  --danger-bg: rgba(239, 68, 68, 0.12);
-  --info: #c9953a;
+  --danger-bg: rgba(239, 68, 68, 0.16);
+  --info: var(--accent);
 
-  /* State layers (hover/focus/pressed) -------------------------------- */
   --state-hover: rgba(255, 255, 255, 0.05);
   --state-focus: rgba(255, 255, 255, 0.08);
   --state-pressed: rgba(255, 255, 255, 0.12);
 
-  /* Rail --------------------------------------------------------------- */
   --rail-width: 240px;
   --rail-width-collapsed: 72px;
   --row-height-inbox: 40px;
 
-  /* Aliases dos primitivos (card / input / header) -------------------- */
   --card-bg: var(--surface-1);
   --card-border: var(--border-thin);
-  --card-border-hover: rgba(201, 149, 58, 0.28);
+  --card-border-hover: rgba(230, 214, 200, 0.28);
   --card-fg: var(--text-1);
-  --header-bg: rgba(0, 0, 0, 0.85);
+  --header-bg: rgba(54, 25, 8, 0.85);
   --header-border: var(--border-thin);
   --input-bg: var(--surface-3);
   --input-border: var(--border-medium);
-  --divider: rgba(255, 255, 255, 0.06);
-  --selection-bg: #c9953a;
-  --selection-fg: #000000;
+  --divider: rgba(255, 255, 255, 0.08);
+  --selection-bg: var(--accent);
+  --selection-fg: var(--on-accent);
 
-  /* Aliases estilo shadcn para o módulo Financeiro -------------------- */
   --primary: var(--accent);
-  --primary-foreground: #000000;
-  --primary-hover: #b07f25;
-  --primary-rgb: 201, 149, 58;
+  --primary-foreground: var(--on-accent);
+  --primary-hover: var(--accent-hover);
+  --primary-rgb: var(--accent-rgb);
   --secondary: var(--surface-2);
   --secondary-foreground: var(--text-1);
   --foreground: var(--fg);
@@ -112,6 +104,62 @@
   --card-foreground: var(--text-1);
   --input: var(--surface-3);
   --input-fg: var(--fg);
+}
+
+/* ---------- CLARO (fundo bege, contraste marrom) ---------- */
+[data-theme="light"] {
+  color-scheme: light;
+
+  --background: #e6d6c8;
+  --background-alt: #dccaba;
+  --bg: #e6d6c8;
+  --fg: #361908;
+
+  --accent: #361908;
+  --accent-rgb: 54, 25, 8;
+  --accent-hover: #4a2710;
+  --accent-active: #2a1305;
+  --accent-subtle: rgba(54, 25, 8, 0.08);
+  --accent-strong: rgba(54, 25, 8, 0.40);
+  --on-accent: #e6d6c8;
+  --logo-color: #361908;
+  --spectral: #ffffff;
+  --spectral-rgb: 255, 255, 255;
+
+  --surface-1: #f3ebe2; /* card */
+  --surface-2: #ede2d6; /* hover */
+  --surface-3: #e2d2c2; /* input */
+
+  --text-1: #2a1607;
+  --text-2: #4a3322;
+  --text-3: #6e5640;
+  --text-4: #9b8470;
+
+  --compose: var(--accent);
+  --compose-foreground: var(--on-accent);
+  --selected: rgba(54, 25, 8, 0.10);
+  --selected-foreground: #2a1607;
+
+  --border-thin: rgba(54, 25, 8, 0.10);
+  --border-medium: rgba(54, 25, 8, 0.18);
+  --border-accent: rgba(54, 25, 8, 0.40);
+
+  --success: #15803d;
+  --success-bg: rgba(21, 128, 61, 0.12);
+  --warning: #b45309;
+  --warning-bg: rgba(180, 83, 9, 0.12);
+  --error: #dc2626;
+  --danger: #dc2626;
+  --danger-bg: rgba(220, 38, 38, 0.12);
+  --info: var(--accent);
+
+  --state-hover: rgba(54, 25, 8, 0.04);
+  --state-focus: rgba(54, 25, 8, 0.08);
+  --state-pressed: rgba(54, 25, 8, 0.12);
+
+  --card-border-hover: rgba(54, 25, 8, 0.28);
+  --header-bg: rgba(230, 214, 200, 0.85);
+  --divider: rgba(54, 25, 8, 0.10);
 }
 
 html,
@@ -146,10 +194,7 @@ body {
 }
 
 /* ============================================================
- * Tipografia — hierarquia por tamanho/peso, sentence case.
- * Uppercase fica reservado às utilitárias .ds-label/.ds-nav/
- * .ds-caption/.ds-micro (chips, status, breadcrumbs, badges) e
- * aos botões .btn-* / .ds-btn.
+ * Tipografia
  * ============================================================ */
 h1, h2, h3, h4, h5, h6,
 .ds-display, .ds-headline {
@@ -170,41 +215,27 @@ h6 { font-size: 13px; font-weight: 600; }
 
 .ds-label {
   font-family: var(--font-inter), "Inter", sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1.25;
-  letter-spacing: 1.17px;
-  text-transform: uppercase;
+  font-size: 12px; font-weight: 600; line-height: 1.25;
+  letter-spacing: 1.17px; text-transform: uppercase;
 }
 .ds-nav {
   font-family: var(--font-inter), "Inter", sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 0.94;
-  letter-spacing: 1.17px;
-  text-transform: uppercase;
+  font-size: 13px; font-weight: 700; line-height: 0.94;
+  letter-spacing: 1.17px; text-transform: uppercase;
 }
 .ds-caption {
   font-family: var(--font-inter), "Inter", sans-serif;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1;
-  letter-spacing: 1px;
-  text-transform: uppercase;
+  font-size: 12px; font-weight: 400; line-height: 1;
+  letter-spacing: 1px; text-transform: uppercase;
 }
 .ds-micro {
   font-family: var(--font-inter), "Inter", sans-serif;
-  font-size: 10px;
-  font-weight: 400;
-  line-height: 0.94;
-  letter-spacing: 1px;
-  text-transform: uppercase;
+  font-size: 10px; font-weight: 400; line-height: 0.94;
+  letter-spacing: 1px; text-transform: uppercase;
 }
 .ds-mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1.45;
+  font-size: 13px; font-weight: 500; line-height: 1.45;
 }
 
 ::selection {
@@ -212,32 +243,19 @@ h6 { font-size: 13px; font-weight: 600; }
   color: var(--selection-fg);
 }
 
-input,
-select,
-button,
-textarea {
+input, select, button, textarea {
   font-family: inherit;
   touch-action: manipulation;
 }
 
-/* iOS: evita auto-zoom em inputs (mínimo 16px) */
 @media screen and (max-width: 768px) {
-  input,
-  select,
-  textarea {
-    font-size: 16px !important;
-  }
+  input, select, textarea { font-size: 16px !important; }
 }
 
-table {
-  border-collapse: collapse;
-}
+table { border-collapse: collapse; }
 
 /* ============================================================
- * Card primitive — .solid-surface (nome legado do ERP) e .glass
- * são equivalentes: preto fosco, raio 16px, borda fina + glow
- * dourado discreto de 3 camadas. Hover: glow mais forte + borda ouro.
- * Como TODO card do ERP usa .solid-surface, o visual novo se propaga.
+ * Card primitive — .solid-surface / .glass (equivalentes)
  * ============================================================ */
 .solid-surface,
 .glass {
@@ -246,8 +264,8 @@ table {
   border-radius: 16px;
   color: var(--card-fg);
   box-shadow:
-    0 0 0 1px rgba(201, 149, 58, 0.03),
-    0 2px 24px rgba(201, 149, 58, 0.04),
+    0 0 0 1px rgba(var(--accent-rgb), 0.03),
+    0 2px 24px rgba(var(--accent-rgb), 0.05),
     0 1px 0 rgba(255, 255, 255, 0.02) inset;
   transition: transform 0.22s cubic-bezier(0.22, 0.61, 0.36, 1),
     background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.25s ease;
@@ -258,24 +276,18 @@ table {
   background: var(--surface-2);
   border-color: var(--card-border-hover);
   box-shadow:
-    0 0 0 1px rgba(201, 149, 58, 0.10),
-    0 4px 36px rgba(201, 149, 58, 0.10),
+    0 0 0 1px rgba(var(--accent-rgb), 0.12),
+    0 4px 36px rgba(var(--accent-rgb), 0.12),
     0 1px 0 rgba(255, 255, 255, 0.04) inset;
 }
 
 @media (hover: hover) {
-  .glass-input:hover {
-    border-color: rgba(201, 149, 58, 0.4);
-  }
-  table tbody tr {
-    transition: background-color 0.15s ease;
-  }
+  .glass-input:hover { border-color: rgba(var(--accent-rgb), 0.45); }
+  table tbody tr { transition: background-color 0.15s ease; }
 }
 
 /* ============================================================
- * Hero banner — cabeçalho premium de cada página (Dashboard,
- * Financeiro, Vendas, ...). Fundo ouro-sobre-preto com brilho
- * discreto e fio dourado no topo. Substitui o header solto.
+ * Hero banner — fundo accent-sobre-fundo, com fio de contraste no topo
  * ============================================================ */
 .hero-banner {
   position: relative;
@@ -285,35 +297,33 @@ table {
   background:
     radial-gradient(
       120% 160% at 0% 0%,
-      rgba(201, 149, 58, 0.16),
-      rgba(201, 149, 58, 0.03) 42%,
+      rgba(var(--accent-rgb), 0.16),
+      rgba(var(--accent-rgb), 0.03) 42%,
       transparent 70%
     ),
-    linear-gradient(135deg, rgba(201, 149, 58, 0.1), rgba(0, 0, 0, 0) 58%),
+    linear-gradient(135deg, rgba(var(--accent-rgb), 0.10), rgba(0, 0, 0, 0) 58%),
     var(--surface-1);
-  border: 1px solid rgba(201, 149, 58, 0.24);
+  border: 1px solid rgba(var(--accent-rgb), 0.24);
   box-shadow:
-    0 0 0 1px rgba(201, 149, 58, 0.04) inset,
-    0 10px 44px rgba(201, 149, 58, 0.09),
+    0 0 0 1px rgba(var(--accent-rgb), 0.05) inset,
+    0 10px 44px rgba(var(--accent-rgb), 0.10),
     0 1px 0 rgba(255, 255, 255, 0.03) inset;
 }
 .hero-banner::before {
   content: "";
   position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
+  left: 0; right: 0; top: 0;
   height: 2px;
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(201, 149, 58, 0.75),
+    rgba(var(--accent-rgb), 0.75),
     transparent
   );
 }
 
 /* ============================================================
- * Input primitive — .glass-input
+ * Input primitive
  * ============================================================ */
 .glass-input {
   background: var(--input-bg);
@@ -324,12 +334,10 @@ table {
   transition: border-color 0.2s ease;
   padding: 10px 14px;
 }
-.glass-input:focus {
-  border-color: rgba(var(--spectral-rgb), 0.55);
-}
+.glass-input:focus { border-color: rgba(var(--accent-rgb), 0.6); }
 
 /* ============================================================
- * Botões dourados (CTAs). Raio 10px, uppercase com tracking.
+ * Botões (CTAs). Texto sobre accent = var(--on-accent).
  * ============================================================ */
 .ds-btn,
 .btn-gold-filled,
@@ -342,97 +350,90 @@ table {
 }
 
 .btn-gold-filled {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   background: var(--accent);
-  color: #000;
+  color: var(--on-accent);
   border: 1px solid var(--accent);
   border-radius: 10px;
   padding: 12px 22px;
   font-family: var(--font-inter), "Inter", sans-serif;
-  font-weight: 700;
-  font-size: 11px;
-  box-shadow: 0 0 16px rgba(201, 149, 58, 0.12);
+  font-weight: 700; font-size: 11px;
+  box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.14);
   cursor: pointer;
   transition: filter 0.2s ease, box-shadow 0.2s ease;
 }
 .btn-gold-filled:hover {
-  filter: brightness(1.1);
-  box-shadow: 0 0 24px rgba(201, 149, 58, 0.30);
+  filter: brightness(1.05);
+  box-shadow: 0 0 24px rgba(var(--accent-rgb), 0.30);
 }
 
 .btn-gold-outline {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   background: transparent;
   border: 1px solid rgba(var(--accent-rgb), 0.4);
   color: var(--accent);
   border-radius: 10px;
   padding: 12px 22px;
   font-family: var(--font-inter), "Inter", sans-serif;
-  font-weight: 600;
-  font-size: 11px;
+  font-weight: 600; font-size: 11px;
   cursor: pointer;
   transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 .btn-gold-outline:hover {
   background: rgba(var(--accent-rgb), 0.10);
   border-color: rgba(var(--accent-rgb), 0.65);
-  box-shadow: 0 0 16px rgba(201, 149, 58, 0.18);
+  box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.18);
 }
 
 .btn-ghost {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   background: rgba(var(--accent-rgb), 0.10);
   color: var(--accent);
   border: 1px solid rgba(var(--accent-rgb), 0.35);
   border-radius: 10px;
   padding: 12px 22px;
   font-family: var(--font-inter), "Inter", sans-serif;
-  font-weight: 600;
-  font-size: 11px;
+  font-weight: 600; font-size: 11px;
   cursor: pointer;
   transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 .btn-ghost:hover {
   background: rgba(var(--accent-rgb), 0.18);
   border-color: rgba(var(--accent-rgb), 0.6);
-  box-shadow: 0 0 16px rgba(201, 149, 58, 0.18);
+  box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.18);
 }
+
+/* ============================================================
+ * Logo TATO adaptável ao tema (troca por data-theme)
+ * ============================================================ */
+.tato-logo { display: inline-flex; align-items: center; }
+.tato-logo img { display: block; width: auto; }
+.tato-logo .tl-light { display: none; }
+.tato-logo .tl-dark { display: block; }
+[data-theme="light"] .tato-logo .tl-light { display: block; }
+[data-theme="light"] .tato-logo .tl-dark { display: none; }
 
 /* ============================================================
  * Helpers
  * ============================================================ */
 .eyebrow {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em;
   color: var(--text-3);
 }
 
 .gold-divider {
-  width: 64px;
-  height: 2px;
+  width: 64px; height: 2px;
   background: linear-gradient(
     90deg,
-    rgba(201, 149, 58, 0.85) 0%,
-    rgba(201, 149, 58, 0.6) 35%,
-    rgba(201, 149, 58, 0) 100%
+    rgba(var(--accent-rgb), 0.85) 0%,
+    rgba(var(--accent-rgb), 0.6) 35%,
+    rgba(var(--accent-rgb), 0) 100%
   );
   border-radius: 2px;
-  box-shadow: 0 0 12px rgba(201, 149, 58, 0.25);
+  box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.25);
 }
 
-.tabular-nums {
-  font-variant-numeric: tabular-nums;
-}
+.tabular-nums { font-variant-numeric: tabular-nums; }
 
 .glass-header {
   background: var(--header-bg);
@@ -455,57 +456,35 @@ table {
 }
 .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
 
-/* M3 state layer — overlay translúcido on-surface */
-.state-layer {
-  transition: background-color 150ms ease;
-}
+.state-layer { transition: background-color 150ms ease; }
 .state-layer:hover { background-color: var(--state-hover); }
 .state-layer:focus-visible { background-color: var(--state-focus); outline: none; }
 .state-layer:active { background-color: var(--state-pressed); }
 
-.focus-ring {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--accent);
-}
+.focus-ring { outline: none; box-shadow: 0 0 0 2px var(--accent); }
 
-/* Marca d'água Λ no canto inferior direito do app shell */
+/* Marca d'água do logo no canto inferior direito */
 .anomalo-mark {
   position: fixed;
-  bottom: 16px;
-  right: 16px;
+  bottom: 16px; right: 16px;
   z-index: 30;
-  opacity: 0.08;
+  opacity: 0.06;
   pointer-events: none;
-  color: var(--accent);
 }
 
 /* ============================================================
- * Print — usado pelo botão "Exportar PDF" do Financeiro/Relatórios.
- * Fundo branco, tinta preta, esconde navegação/sino/botões.
+ * Print — Exportar PDF do Financeiro
  * ============================================================ */
 @media print {
-  aside,
-  .sino-trigger,
-  .no-print {
-    display: none !important;
-  }
-  html,
-  body,
-  .glass,
-  .solid-surface,
-  .hero-banner,
-  .glass-header {
+  aside, .sino-trigger, .no-print, .anomalo-mark { display: none !important; }
+  html, body, .glass, .solid-surface, .hero-banner, .glass-header {
     background: #ffffff !important;
     color: #000000 !important;
     box-shadow: none !important;
     border-color: #d5d5d5 !important;
   }
-  main {
-    margin-left: 0 !important;
-    padding: 16mm !important;
-  }
-  .glass,
-  .solid-surface {
+  main { margin-left: 0 !important; padding: 16mm !important; }
+  .glass, .solid-surface {
     border: 1px solid #d5d5d5 !important;
     border-radius: 8px !important;
     page-break-inside: avoid;

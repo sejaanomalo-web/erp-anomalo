@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/components/feedback/Toast";
 import { CategoriaRow, useSalvarCategoria, TipoFin } from "@/lib/queries/financeiro";
 
-const CORES = ["#C9953A", "#16a34a", "#22c55e", "#ef4444", "#eab308", "#3b82f6", "#a855f7"];
+const CORES = ["#E6D6C8", "#16a34a", "#22c55e", "#ef4444", "#eab308", "#3b82f6", "#a855f7"];
 
 type Props = {
   open: boolean;
@@ -22,14 +22,14 @@ export function CategoriaDrawer({ open, onOpenChange, editar, tipoInicial }: Pro
 
   const [nome, setNome] = useState("");
   const [tipo, setTipo] = useState<TipoFin>("saida");
-  const [cor, setCor] = useState("#C9953A");
+  const [cor, setCor] = useState("#E6D6C8");
   const [ativa, setAtiva] = useState(true);
 
   useEffect(() => {
     if (!open) return;
     setNome(editar?.nome ?? "");
     setTipo(editar?.tipo ?? tipoInicial ?? "saida");
-    setCor(editar?.cor ?? "#C9953A");
+    setCor(editar?.cor ?? "#E6D6C8");
     setAtiva(editar?.ativa ?? true);
   }, [open, editar, tipoInicial]);
 

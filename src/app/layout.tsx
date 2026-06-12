@@ -19,16 +19,16 @@ const robotoMono = Roboto_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "TꓥTO ESTOFADOS",
-    template: "%s · TꓥTO ESTOFADOS",
+    default: "TATO",
+    template: "%s · TATO",
   },
-  description: "Sistema operacional Tꓥto Estofados",
-  applicationName: "TꓥTO ESTOFADOS",
+  description: "Sistema operacional TATO",
+  applicationName: "TATO",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "TꓥTO ESTOFADOS",
+    title: "TATO",
   },
   formatDetection: {
     telephone: false,
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#000000",
+  themeColor: "#361908",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,

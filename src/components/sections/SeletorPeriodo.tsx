@@ -29,7 +29,7 @@ export function SeletorPeriodo() {
               className={cn(
                 "rounded-lg border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.04em] transition-colors duration-fast",
                 ativo
-                  ? "border-accent bg-accent text-black"
+                  ? "border-accent bg-accent text-[var(--on-accent)]"
                   : "border-border-thin bg-transparent text-text-3 hover:border-border-medium hover:text-text-1",
               )}
             >
