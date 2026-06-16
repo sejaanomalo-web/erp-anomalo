@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Plus, ShoppingCart, Search, Columns3 } from "lucide-react";
+import { Plus, ShoppingCart, Search, Columns3, CalendarPlus } from "lucide-react";
 import { Hero } from "@/components/sections/Hero";
 import { Button } from "@/components/ui/button";
+import { OrcamentoDialog } from "@/components/vendas/OrcamentoDialog";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -25,15 +26,24 @@ import {
 } from "@/lib/constants";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { useDebounce } from "@/hooks/useDebounce";
+import { usePeriodo } from "@/hooks/usePeriodo";
 import { useVendas, type VendaListRow } from "@/lib/queries/vendas";
 import type { VendaStatus, VendaTipo } from "@/types/database.types";
 
 export default function VendasPage() {
+  const { periodo } = usePeriodo();
   const [busca, setBusca] = useState("");
   const [status, setStatus] = useState<VendaStatus | "todos">("todos");
   const [tipo, setTipo] = useState<VendaTipo | "todos">("todos");
+  const [orcamentoOpen, setOrcamentoOpen] = useState(false);
   const buscaDebounced = useDebounce(busca, 200);
-  const vendas = useVendas({ status, tipo, busca: buscaDebounced });
+  const vendas = useVendas({
+    status,
+    tipo,
+    busca: buscaDebounced,
+    inicio: periodo.de,
+    fim: periodo.ate,
+  });
 
   const columns: DataTableColumn<VendaListRow>[] = [
     {
@@ -121,9 +131,15 @@ export default function VendasPage() {
                 Nova venda
               </Link>
             </Button>
+            <Button variant="secondary" onClick={() => setOrcamentoOpen(true)}>
+              <CalendarPlus size={14} strokeWidth={1.8} />
+              Orçamento
+            </Button>
           </div>
         }
       />
+
+      <OrcamentoDialog open={orcamentoOpen} onOpenChange={setOrcamentoOpen} />
 
       <div className="flex flex-col md:flex-row md:items-end gap-md">
         <div className="flex flex-col gap-xs flex-1 md:max-w-md">

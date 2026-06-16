@@ -17,7 +17,7 @@ export const Checkbox = React.forwardRef<
     )}
     {...props}
   >
-    <CheckboxPrimitive.Indicator className="flex items-center justify-center text-black">
+    <CheckboxPrimitive.Indicator className="flex items-center justify-center text-[var(--on-accent)]">
       <Check size={12} strokeWidth={3} />
     </CheckboxPrimitive.Indicator>
   </CheckboxPrimitive.Root>

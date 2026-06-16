@@ -5,29 +5,29 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-// Gmail / Material 3: botões em pill (rounded-full), tipografia sentence case,
-// Roboto 500 14px. State layers via mudança de bg-color no hover.
+// Anômalo dark-gold: CTAs dourados, raio 10px, uppercase com tracking.
+// Variantes utilitárias (ghost/link) ficam em sentence case para ações
+// discretas (ícones, dropdowns, fechar).
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium tracking-[0.0142857em] transition-[background,color,border-color,box-shadow,opacity] duration-fast disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:shadow-[0_0_0_2px_var(--accent-strong)]",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[10px] uppercase font-bold tracking-[0.075em] transition-[background,color,border-color,box-shadow,filter,opacity] duration-fast disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:shadow-[0_0_0_2px_var(--accent-strong)]",
   {
     variants: {
       variant: {
-        // Primary action = Google Blue 700 com texto branco (M3 primary).
+        // CTA principal = ouro preenchido com texto preto + glow dourado.
         default:
-          "bg-accent text-white hover:bg-accent-hover hover:shadow-sm active:bg-accent-active",
-        // Compose pill — pale blue (M3 secondary container). Usado em CTAs
-        // amistosos como "Nova venda".
+          "bg-accent text-[var(--on-accent)] border border-accent shadow-[0_0_16px_rgba(var(--accent-rgb),0.12)] hover:brightness-110 hover:shadow-[0_0_24px_rgba(var(--accent-rgb),0.30)]",
+        // "Nova venda" usa o mesmo ouro preenchido.
         compose:
-          "bg-compose text-compose-foreground hover:shadow-md active:brightness-95",
+          "bg-accent text-[var(--on-accent)] border border-accent shadow-[0_0_16px_rgba(var(--accent-rgb),0.12)] hover:brightness-110 hover:shadow-[0_0_24px_rgba(var(--accent-rgb),0.30)]",
         outline:
-          "border border-border-medium text-text-1 bg-surface-1 hover:bg-[var(--state-hover)] active:bg-[var(--state-pressed)]",
+          "border border-[rgba(var(--accent-rgb),0.4)] text-accent bg-transparent hover:bg-[rgba(var(--accent-rgb),0.10)] hover:border-[rgba(var(--accent-rgb),0.65)] hover:shadow-[0_0_16px_rgba(var(--accent-rgb),0.18)]",
         ghost:
-          "bg-transparent text-text-1 hover:bg-[var(--state-hover)] active:bg-[var(--state-pressed)]",
+          "bg-transparent text-text-2 normal-case font-medium tracking-normal hover:bg-[var(--state-hover)] hover:text-text-1 active:bg-[var(--state-pressed)]",
         secondary:
           "bg-surface-2 text-text-1 border border-border-thin hover:bg-surface-3",
         destructive:
-          "bg-error text-white hover:brightness-110 active:brightness-90",
-        link: "text-accent underline-offset-4 hover:underline px-0",
+          "bg-transparent text-danger border border-[rgba(239,68,68,0.4)] hover:bg-[rgba(239,68,68,0.12)] hover:border-[rgba(239,68,68,0.65)]",
+        link: "text-accent underline-offset-4 hover:underline px-0 normal-case font-medium tracking-normal",
       },
       size: {
         sm: "h-8 px-3 text-button",

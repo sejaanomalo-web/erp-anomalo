@@ -47,15 +47,16 @@ const config: Config = {
           medium: "var(--border-medium)",
           accent: "var(--border-accent)",
         },
-        // Google brand palette
-        success: "#34A853",
-        warning: "#FBBC04",
-        error: "#EA4335",
-        info: "#4285F4",
+        // Semântica de status (Anômalo dark-gold)
+        success: "var(--success)",
+        warning: "var(--warning)",
+        error: "var(--error)",
+        danger: "var(--danger)",
+        info: "var(--info)",
       },
       fontFamily: {
-        sans: ["var(--font-roboto)", "system-ui", "sans-serif"],
-        display: ["var(--font-roboto)", "system-ui", "sans-serif"],
+        sans: ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
+        display: ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
         mono: [
           "var(--font-roboto-mono)",
           "ui-monospace",
@@ -64,85 +65,57 @@ const config: Config = {
           "Consolas",
           "monospace",
         ],
-        icons: [
-          "Material Symbols Outlined",
-          "Material Icons",
-          "sans-serif",
-        ],
       },
       fontSize: {
-        // Gmail/M3: sentence case throughout, no uppercase forçado
+        // Anômalo: hierarquia por tamanho/peso, títulos bold sentence case
+        // com tracking apertado; uppercase só nas utilitárias (label/caption).
         display: [
-          "1.375rem",
-          { lineHeight: "1.2", letterSpacing: "0em", fontWeight: "500" },
+          "2rem",
+          { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "700" },
         ],
         h1: [
-          "1.5rem",
-          { lineHeight: "1.25", letterSpacing: "0em", fontWeight: "500" },
+          "2rem",
+          { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "700" },
         ],
         h2: [
-          "1.25rem",
-          { lineHeight: "1.3", letterSpacing: "0em", fontWeight: "500" },
+          "1.5rem",
+          { lineHeight: "1.15", letterSpacing: "-0.015em", fontWeight: "700" },
         ],
         h3: [
-          "1.125rem",
-          { lineHeight: "1.33", letterSpacing: "0em", fontWeight: "500" },
+          "1.25rem",
+          { lineHeight: "1.15", letterSpacing: "-0.01em", fontWeight: "600" },
         ],
         h4: [
           "1rem",
-          { lineHeight: "1.4", letterSpacing: "0em", fontWeight: "500" },
+          { lineHeight: "1.15", letterSpacing: "-0.01em", fontWeight: "600" },
         ],
         h5: [
           "0.875rem",
-          {
-            lineHeight: "1.43",
-            letterSpacing: "0.0142857em",
-            fontWeight: "500",
-          },
+          { lineHeight: "1.15", letterSpacing: "-0.01em", fontWeight: "600" },
         ],
         h6: [
           "0.8125rem",
-          { lineHeight: "1.5", letterSpacing: "0.01em", fontWeight: "500" },
+          { lineHeight: "1.15", letterSpacing: "-0.01em", fontWeight: "600" },
         ],
         "body-md": [
           "0.875rem",
-          {
-            lineHeight: "1.43",
-            letterSpacing: "0.0142857em",
-            fontWeight: "400",
-          },
+          { lineHeight: "1.6", letterSpacing: "0em", fontWeight: "400" },
         ],
         "body-sm": [
-          "0.8125rem",
-          {
-            lineHeight: "1.46",
-            letterSpacing: "0.0153846em",
-            fontWeight: "400",
-          },
+          "0.75rem",
+          { lineHeight: "1.5", letterSpacing: "0em", fontWeight: "400" },
         ],
         button: [
-          "0.875rem",
-          {
-            lineHeight: "1.43",
-            letterSpacing: "0.0142857em",
-            fontWeight: "500",
-          },
+          "0.6875rem",
+          { lineHeight: "1", letterSpacing: "0.075em", fontWeight: "700" },
         ],
         "label-caps": [
           "0.75rem",
-          {
-            lineHeight: "1.33",
-            letterSpacing: "0.025em",
-            fontWeight: "500",
-          },
+          { lineHeight: "1.25", letterSpacing: "0.075em", fontWeight: "600" },
         ],
         caption: [
           "0.75rem",
-          {
-            lineHeight: "1.33",
-            letterSpacing: "0.0333333em",
-            fontWeight: "400",
-          },
+          { lineHeight: "1", letterSpacing: "0.06em", fontWeight: "400" },
         ],
       },
       spacing: {
@@ -171,14 +144,14 @@ const config: Config = {
       },
       boxShadow: {
         none: "none",
-        // M3 elevations suavizadas para uso em produtividade
-        sm: "0 1px 2px 0 rgba(60,64,67,0.10), 0 1px 3px 1px rgba(60,64,67,0.05)",
-        md: "0 1px 3px 0 rgba(60,64,67,0.16), 0 4px 8px 3px rgba(60,64,67,0.08)",
-        lg: "0 4px 8px 3px rgba(60,64,67,0.15), 0 1px 3px 0 rgba(60,64,67,0.20)",
-        elevated:
-          "0 4px 12px rgba(60,64,67,0.15), 0 1px 3px 0 rgba(60,64,67,0.10)",
-        "hover-sm": "0 1px 2px 0 rgba(60,64,67,0.10)",
-        "hover-md": "0 2px 6px 2px rgba(60,64,67,0.12)",
+        // Glow dourado discreto + drop escuro para drawers/modais
+        sm: "0 0 0 1px rgba(201,149,58,0.20)",
+        md: "0 0 0 1px rgba(201,149,58,0.40), 0 0 24px rgba(201,149,58,0.10)",
+        lg: "0 8px 24px rgba(0,0,0,0.6)",
+        elevated: "0 8px 24px rgba(0,0,0,0.6)",
+        "hover-sm": "0 0 0 1px rgba(201,149,58,0.20)",
+        "hover-md":
+          "0 0 0 1px rgba(201,149,58,0.40), 0 0 24px rgba(201,149,58,0.10)",
       },
       transitionDuration: {
         fast: "150ms",

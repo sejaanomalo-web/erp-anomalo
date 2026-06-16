@@ -24,6 +24,9 @@ interface VendasFilters {
   status?: VendaStatus | "todos";
   busca?: string;
   vendedorId?: string;
+  /** Período global (data_venda entre inicio e fim, YYYY-MM-DD). */
+  inicio?: string;
+  fim?: string;
 }
 
 export function useVendas(filters: VendasFilters = {}) {
@@ -47,6 +50,12 @@ export function useVendas(filters: VendasFilters = {}) {
       }
       if (filters.vendedorId) {
         query = query.eq("vendedor_id", filters.vendedorId);
+      }
+      if (filters.inicio) {
+        query = query.gte("data_venda", filters.inicio);
+      }
+      if (filters.fim) {
+        query = query.lte("data_venda", filters.fim);
       }
 
       const { data, error } = await query;

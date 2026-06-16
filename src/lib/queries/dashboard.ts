@@ -21,14 +21,14 @@ export interface DashboardKpis {
   ticketMedio: number;
 }
 
-export function useDashboardKpis() {
+export function useDashboardKpis(inicio?: string, fim?: string) {
   return useQuery({
-    queryKey: queryKeys.dashboardKpis(),
+    queryKey: ["dashboard", "kpis", inicio ?? "mes", fim ?? "mes"],
     queryFn: async (): Promise<DashboardKpis> => {
       const supabase = createClient();
       const now = new Date();
-      const mesInicio = startOfMonth(now).toISOString().slice(0, 10);
-      const mesFim = endOfMonth(now).toISOString().slice(0, 10);
+      const mesInicio = inicio ?? startOfMonth(now).toISOString().slice(0, 10);
+      const mesFim = fim ?? endOfMonth(now).toISOString().slice(0, 10);
       const proximos7 = subDays(now, -7).toISOString().slice(0, 10);
 
       const [

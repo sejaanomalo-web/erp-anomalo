@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Menu, X, LogOut, Pencil } from "lucide-react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { useState } from "react";
-import { AnomaloMark } from "@/components/brand/AnomaloMark";
+import { TatoLogo } from "@/components/brand/TatoLogo";
 import { NAV } from "@/lib/navigation";
 import { usePermissions } from "@/hooks/usePermissions";
 import { cn } from "@/lib/utils";
@@ -44,15 +44,14 @@ export function MobileDrawer() {
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="left" className="p-0 bg-background" hideClose>
           <div className="flex items-center justify-between gap-2 px-4 h-16">
-            <div className="flex items-center gap-2 text-text-1 font-semibold text-base tracking-[0.08em]">
-              <AnomaloMark size={18} className="text-accent" decorative={false} />
-              TꓥTO ESTOFADOS
+            <div className="flex items-center">
+              <TatoLogo height={22} />
             </div>
             <button
               type="button"
               aria-label="Fechar"
               onClick={() => setOpen(false)}
-              className="h-10 w-10 inline-flex items-center justify-center rounded-full text-text-2 hover:bg-[var(--state-hover)]"
+              className="h-10 w-10 inline-flex items-center justify-center rounded-[10px] text-text-2 hover:bg-surface-2"
             >
               <X size={20} strokeWidth={1.8} />
             </button>
@@ -66,16 +65,18 @@ export function MobileDrawer() {
                   setOpen(false);
                   router.push("/vendas/nova");
                 }}
-                className="inline-flex items-center justify-start gap-3 h-14 w-full pl-4 pr-6 bg-compose text-compose-foreground rounded-2xl shadow-sm"
+                className="inline-flex items-center justify-start gap-3 h-12 w-full pl-4 pr-6 bg-accent text-[var(--on-accent)] rounded-[12px] shadow-[0_0_16px_rgba(var(--accent-rgb),0.12)]"
               >
-                <Pencil size={20} strokeWidth={2} />
-                <span className="text-body-md font-medium">Nova venda</span>
+                <Pencil size={18} strokeWidth={2.2} />
+                <span className="text-button uppercase tracking-[0.075em] font-bold">
+                  Nova venda
+                </span>
               </button>
             </div>
           ) : null}
 
-          <nav className="flex-1 overflow-y-auto scrollbar-thin pr-2">
-            <ul className="flex flex-col gap-[2px]">
+          <nav className="flex-1 overflow-y-auto scrollbar-thin px-3">
+            <ul className="flex flex-col gap-1">
               {items.map((item) => {
                 const Icon = item.icon;
                 const active =
@@ -87,28 +88,38 @@ export function MobileDrawer() {
                       href={item.href}
                       onClick={() => setOpen(false)}
                       className={cn(
-                        "flex items-center gap-3 h-10 pl-6 pr-6 rounded-r-full transition-colors duration-fast",
+                        "relative flex items-center gap-3 h-11 px-3 rounded-[10px] transition-colors duration-fast",
                         active
-                          ? "bg-compose text-compose-foreground font-medium"
-                          : "text-text-2 hover:bg-[var(--state-hover)]",
+                          ? "bg-surface-2 text-text-1"
+                          : "text-text-2 hover:bg-surface-2",
                       )}
                     >
-                      <Icon size={20} strokeWidth={active ? 2.2 : 1.8} />
-                      <span className="text-body-md">{item.label}</span>
+                      {active ? (
+                        <span
+                          aria-hidden
+                          className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-[2px] bg-accent"
+                        />
+                      ) : null}
+                      <Icon
+                        size={20}
+                        strokeWidth={active ? 2 : 1.8}
+                        className={active ? "text-accent" : "text-text-2"}
+                      />
+                      <span className="text-body-md font-medium">{item.label}</span>
                     </Link>
                   </li>
                 );
               })}
             </ul>
           </nav>
-          <div className="p-2">
+          <div className="p-3 border-t border-border-thin">
             <button
               type="button"
               onClick={sair}
-              className="flex items-center gap-3 h-10 w-full px-4 rounded-full text-text-2 hover:bg-[var(--state-hover)]"
+              className="flex items-center gap-3 h-11 w-full px-3 rounded-[10px] text-text-2 hover:bg-surface-2"
             >
               <LogOut size={18} strokeWidth={1.8} />
-              <span className="text-body-md">Sair</span>
+              <span className="text-body-md font-medium">Sair</span>
             </button>
           </div>
         </SheetContent>

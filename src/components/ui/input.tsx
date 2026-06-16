@@ -25,7 +25,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         type={type}
         onFocus={handleFocus}
         className={cn(
-          "flex h-10 w-full rounded-md border border-border-medium bg-surface-1 px-3 py-2 text-body-md text-text-1 placeholder:text-text-3 transition-colors duration-fast file:border-0 file:bg-transparent file:text-body-sm file:font-medium focus-visible:outline-none focus-visible:border-accent focus-visible:shadow-[0_0_0_1px_var(--accent)] disabled:cursor-not-allowed disabled:opacity-50",
+          "flex h-10 w-full rounded-[10px] border border-border-medium bg-surface-3 px-3 py-2 text-body-md text-text-1 placeholder:text-text-3 transition-colors duration-fast file:border-0 file:bg-transparent file:text-body-sm file:font-medium focus-visible:outline-none focus-visible:border-accent focus-visible:shadow-[0_0_0_1px_var(--accent)] disabled:cursor-not-allowed disabled:opacity-50",
           className,
         )}
         {...props}

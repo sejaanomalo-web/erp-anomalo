@@ -1,4 +1,4 @@
-import { AnomaloMark } from "@/components/brand/AnomaloMark";
+import { TatoLogo } from "@/components/brand/TatoLogo";
 
 export default function AuthLayout({
   children,
@@ -8,9 +8,8 @@ export default function AuthLayout({
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-md py-2xl">
       <div className="w-full max-w-md flex flex-col gap-2xl">
-        <div className="flex items-center gap-2 text-text-1 font-semibold text-base tracking-[0.08em]">
-          <AnomaloMark size={18} className="text-accent" decorative={false} />
-          TꓥTO ESTOFADOS
+        <div className="flex items-center">
+          <TatoLogo height={22} />
         </div>
         {children}
       </div>
