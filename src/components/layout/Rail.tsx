@@ -70,7 +70,7 @@ export function Rail({ collapsed, onToggle }: RailProps) {
             onClick={() => router.push("/vendas/nova")}
             title="Nova venda"
             className={cn(
-              "inline-flex items-center justify-start gap-3 h-12 bg-accent text-[var(--on-accent)] rounded-[12px] shadow-[0_0_16px_rgba(var(--accent-rgb),0.12)] hover:brightness-110 hover:shadow-[0_0_24px_rgba(var(--accent-rgb),0.30)] transition-[filter,box-shadow] duration-fast",
+              "inline-flex items-center justify-start gap-3 h-12 bg-[var(--cta-bg)] text-[var(--cta-fg)] border border-[var(--cta-border)] rounded-[12px] shadow-[0_0_16px_rgba(var(--accent-rgb),0.12)] hover:bg-[var(--cta-bg-hover)] hover:shadow-[0_0_24px_rgba(var(--accent-rgb),0.30)] transition-[background,box-shadow] duration-fast",
               collapsed ? "w-12 justify-center" : "w-full pl-4 pr-6",
             )}
           >

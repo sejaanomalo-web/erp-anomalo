@@ -67,7 +67,7 @@ export function MobileDrawer() {
                   setOpen(false);
                   router.push("/vendas/nova");
                 }}
-                className="inline-flex items-center justify-start gap-3 h-12 w-full pl-4 pr-6 bg-accent text-[var(--on-accent)] rounded-[12px] shadow-[0_0_16px_rgba(var(--accent-rgb),0.12)]"
+                className="inline-flex items-center justify-start gap-3 h-12 w-full pl-4 pr-6 bg-[var(--cta-bg)] text-[var(--cta-fg)] border border-[var(--cta-border)] rounded-[12px] shadow-[0_0_16px_rgba(var(--accent-rgb),0.12)]"
               >
                 <Pencil size={18} strokeWidth={2.2} />
                 <span className="text-button uppercase tracking-[0.075em] font-bold">
