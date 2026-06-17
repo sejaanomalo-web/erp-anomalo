@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, X, LogOut, Pencil } from "lucide-react";
+import { Menu, X, LogOut, Pencil, CalendarPlus } from "lucide-react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { useState } from "react";
 import { TatoLogo } from "@/components/brand/TatoLogo";
+import { OrcamentoDialog } from "@/components/vendas/OrcamentoDialog";
 import { NAV } from "@/lib/navigation";
 import { usePermissions } from "@/hooks/usePermissions";
 import { cn } from "@/lib/utils";
@@ -26,6 +27,7 @@ export function MobileTrigger({ onClick }: { onClick: () => void }) {
 
 export function MobileDrawer() {
   const [open, setOpen] = useState(false);
+  const [orcamentoOpen, setOrcamentoOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const { canAccess } = usePermissions();
@@ -70,6 +72,19 @@ export function MobileDrawer() {
                 <Pencil size={18} strokeWidth={2.2} />
                 <span className="text-button uppercase tracking-[0.075em] font-bold">
                   Nova venda
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  setOrcamentoOpen(true);
+                }}
+                className="mt-2 inline-flex items-center justify-start gap-3 h-12 w-full pl-4 pr-6 rounded-[12px] border border-[rgba(var(--accent-rgb),0.40)] text-accent hover:bg-[rgba(var(--accent-rgb),0.10)] transition-colors duration-fast"
+              >
+                <CalendarPlus size={18} strokeWidth={2.2} />
+                <span className="text-button uppercase tracking-[0.075em] font-bold">
+                  Orçamento
                 </span>
               </button>
             </div>
@@ -124,6 +139,7 @@ export function MobileDrawer() {
           </div>
         </SheetContent>
       </Sheet>
+      <OrcamentoDialog open={orcamentoOpen} onOpenChange={setOrcamentoOpen} />
     </>
   );
 }
