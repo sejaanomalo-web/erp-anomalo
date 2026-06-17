@@ -35,6 +35,9 @@ export const queryKeys = {
 
   vendedores: () => ["vendedores"] as const,
   vendedoresList: () => ["vendedores", "list"] as const,
+  // Lista enxuta (id, nome, papel) p/ selects; key distinta da lista admin
+  // para não colidir no cache do TanStack (shapes diferentes, mesma feature).
+  vendedoresOptions: () => ["vendedores", "options"] as const,
 
   materiais: () => ["materiais"] as const,
   materiaisList: () => ["materiais", "list"] as const,
