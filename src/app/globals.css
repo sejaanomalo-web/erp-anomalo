@@ -45,7 +45,7 @@
   --text-1: #ffffff;
   --text-2: #ece1d6;
   --text-3: #c3b2a2;
-  --text-4: #927a64;
+  --text-4: #a08a73; /* legendas: contraste ~4.9:1 sobre o fundo (era ~4:1) */
 
   --compose: var(--accent);
   --compose-foreground: var(--on-accent);
@@ -133,7 +133,7 @@
   --text-1: #2a1607;
   --text-2: #4a3322;
   --text-3: #6e5640;
-  --text-4: #9b8470;
+  --text-4: #836b54; /* legendas: contraste ~3.5:1 sobre o bege (era ~2.5:1) */
 
   --compose: var(--accent);
   --compose-foreground: var(--on-accent);
