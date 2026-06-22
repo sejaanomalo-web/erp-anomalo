@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/feedback/Toast";
 import { CategoriaRow, useSalvarCategoria, TipoFin } from "@/lib/queries/financeiro";
+import { mensagemErroSupabase } from "@/lib/errors";
 
 const CORES = ["#E6D6C8", "#16a34a", "#22c55e", "#ef4444", "#eab308", "#3b82f6", "#a855f7"];
 
@@ -35,16 +36,24 @@ export function CategoriaDrawer({ open, onOpenChange, editar, tipoInicial }: Pro
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    await salvar.mutateAsync({
-      id: editar?.id,
-      nome: nome.trim(),
-      tipo,
-      cor,
-      ativa,
-      ordem: editar?.ordem ?? 0,
-    });
-    toast.success("Categoria salva.");
-    onOpenChange(false);
+    if (nome.trim().length < 2) {
+      toast.error("Informe um nome com pelo menos 2 caracteres.");
+      return;
+    }
+    try {
+      await salvar.mutateAsync({
+        id: editar?.id,
+        nome: nome.trim(),
+        tipo,
+        cor,
+        ativa,
+        ordem: editar?.ordem ?? 0,
+      });
+      toast.success("Categoria salva.");
+      onOpenChange(false);
+    } catch (err) {
+      toast.error(mensagemErroSupabase(err, "Erro ao salvar a categoria."));
+    }
   }
 
   return (

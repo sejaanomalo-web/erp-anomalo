@@ -24,6 +24,7 @@ import {
   useSalvarConta,
   TIPO_CONTA_ROTULO,
 } from "@/lib/queries/financeiro";
+import { mensagemErroSupabase } from "@/lib/errors";
 
 type TipoConta = ContaRow["tipo"];
 
@@ -89,8 +90,8 @@ export function ContaDrawer({
       });
       toast.success("Conta salva.");
       onOpenChange(false);
-    } catch {
-      toast.error("Erro ao salvar a conta.");
+    } catch (err) {
+      toast.error(mensagemErroSupabase(err, "Erro ao salvar a conta."));
     }
   }
 
