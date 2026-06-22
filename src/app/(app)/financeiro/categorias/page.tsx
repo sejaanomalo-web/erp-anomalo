@@ -14,6 +14,7 @@ import {
   type CategoriaRow,
   type TipoFin,
 } from "@/lib/queries/financeiro";
+import { mensagemErroSupabase } from "@/lib/errors";
 
 export default function CategoriasPage() {
   const receitas = useCategoriasFinanceiras("entrada");
@@ -68,7 +69,12 @@ export default function CategoriasPage() {
                       await excluir.mutateAsync(c.id);
                       toast.success("Excluída.");
                     } catch (e) {
-                      toast.error(e instanceof Error ? e.message : "Falha.");
+                      toast.error(
+                        mensagemErroSupabase(
+                          e,
+                          "Não foi possível excluir a categoria.",
+                        ),
+                      );
                     }
                   }
                 }}
