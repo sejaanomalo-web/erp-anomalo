@@ -14,15 +14,18 @@ import { cn, formatCurrency } from "@/lib/utils";
 import {
   useRecorrentes,
   useGerarRecorrentes,
+  useExcluirRecorrente,
   tipoRotulo,
   TIPO_CONTA_ROTULO,
   type RecorrenteRow,
 } from "@/lib/queries/financeiro";
+import { mensagemErroSupabase } from "@/lib/errors";
 
 export default function RecorrentesPage() {
   const { periodo } = usePeriodo();
   const recs = useRecorrentes();
   const gerar = useGerarRecorrentes();
+  const excluir = useExcluirRecorrente();
 
   const [open, setOpen] = useState(false);
   const [editar, setEditar] = useState<RecorrenteRow | null>(null);
@@ -103,6 +106,42 @@ export default function RecorrentesPage() {
                     ? `Até ${r.fim.split("-").reverse().join("/")}`
                     : "Sem fim"}
               </p>
+              <div
+                className="mt-2 flex justify-end gap-1"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    setEditar(r);
+                    setOpen(true);
+                  }}
+                >
+                  Editar
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  disabled={excluir.isPending}
+                  onClick={async () => {
+                    if (!confirm(`Excluir o recorrente "${r.nome}"?`)) return;
+                    try {
+                      await excluir.mutateAsync(r.id);
+                      toast.success("Recorrente excluído.");
+                    } catch (err) {
+                      toast.error(
+                        mensagemErroSupabase(
+                          err,
+                          "Não foi possível excluir o recorrente.",
+                        ),
+                      );
+                    }
+                  }}
+                >
+                  Excluir
+                </Button>
+              </div>
             </Card>
           ))}
         </div>

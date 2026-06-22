@@ -23,6 +23,7 @@ import {
 import { CategoriaCombobox } from "@/components/financeiro/CategoriaCombobox";
 import { toast } from "@/components/feedback/Toast";
 import { FORMAS_PAGAMENTO } from "@/lib/constants";
+import { mensagemErroSupabase } from "@/lib/errors";
 import {
   useAtualizarLancamento,
   useContas,
@@ -151,9 +152,7 @@ export function LancamentoDialog({
       setForm(emptyState(tipoInicial));
       onOpenChange(false);
     } catch (err) {
-      toast.error(
-        err instanceof Error ? err.message : "Falha ao salvar lançamento.",
-      );
+      toast.error(mensagemErroSupabase(err, "Falha ao salvar lançamento."));
     }
   }
 

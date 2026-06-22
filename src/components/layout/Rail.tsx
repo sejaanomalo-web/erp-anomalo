@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LogOut, Pencil } from "lucide-react";
+import { useState } from "react";
+import { LogOut, Pencil, CalendarPlus } from "lucide-react";
 import { TatoLogo } from "@/components/brand/TatoLogo";
+import { OrcamentoDialog } from "@/components/vendas/OrcamentoDialog";
 import { NAV } from "@/lib/navigation";
 import { usePermissions } from "@/hooks/usePermissions";
 import { cn } from "@/lib/utils";
@@ -22,6 +24,7 @@ export function Rail({ collapsed, onToggle }: RailProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { canAccess } = usePermissions();
+  const [orcamentoOpen, setOrcamentoOpen] = useState(false);
 
   const items = NAV.filter((item) => !item.modulo || canAccess(item.modulo));
   const podeNovaVenda = canAccess("vendas");
@@ -67,7 +70,7 @@ export function Rail({ collapsed, onToggle }: RailProps) {
             onClick={() => router.push("/vendas/nova")}
             title="Nova venda"
             className={cn(
-              "inline-flex items-center justify-start gap-3 h-12 bg-accent text-[var(--on-accent)] rounded-[12px] shadow-[0_0_16px_rgba(var(--accent-rgb),0.12)] hover:brightness-110 hover:shadow-[0_0_24px_rgba(var(--accent-rgb),0.30)] transition-[filter,box-shadow] duration-fast",
+              "inline-flex items-center justify-start gap-3 h-12 bg-[var(--cta-bg)] text-[var(--cta-fg)] border border-[var(--cta-border)] rounded-[12px] shadow-[0_0_16px_rgba(var(--accent-rgb),0.12)] hover:bg-[var(--cta-bg-hover)] hover:shadow-[0_0_24px_rgba(var(--accent-rgb),0.30)] transition-[background,box-shadow] duration-fast",
               collapsed ? "w-12 justify-center" : "w-full pl-4 pr-6",
             )}
           >
@@ -75,6 +78,28 @@ export function Rail({ collapsed, onToggle }: RailProps) {
             {collapsed ? null : (
               <span className="text-button uppercase tracking-[0.075em] font-bold">
                 Nova venda
+              </span>
+            )}
+          </button>
+        </div>
+      ) : null}
+
+      {/* Orçamento — botão secundário, logo abaixo de Nova venda */}
+      {podeNovaVenda ? (
+        <div className="px-3 pb-3">
+          <button
+            type="button"
+            onClick={() => setOrcamentoOpen(true)}
+            title="Orçamento"
+            className={cn(
+              "inline-flex items-center justify-start gap-3 h-12 rounded-[12px] border border-[rgba(var(--accent-rgb),0.40)] text-accent hover:bg-[rgba(var(--accent-rgb),0.10)] transition-colors duration-fast",
+              collapsed ? "w-12 justify-center" : "w-full pl-4 pr-6",
+            )}
+          >
+            <CalendarPlus size={18} strokeWidth={2.2} />
+            {collapsed ? null : (
+              <span className="text-button uppercase tracking-[0.075em] font-bold">
+                Orçamento
               </span>
             )}
           </button>
@@ -142,6 +167,8 @@ export function Rail({ collapsed, onToggle }: RailProps) {
           )}
         </button>
       </div>
+
+      <OrcamentoDialog open={orcamentoOpen} onOpenChange={setOrcamentoOpen} />
     </aside>
   );
 }

@@ -28,6 +28,7 @@ import {
   useSalvarRecorrente,
   type RecorrenteRow,
 } from "@/lib/queries/financeiro";
+import { mensagemErroSupabase } from "@/lib/errors";
 
 interface Props {
   open: boolean;
@@ -107,9 +108,7 @@ export function RecorrenteDrawer({ open, onOpenChange, editar }: Props) {
       toast.success("Recorrente salvo.");
       onOpenChange(false);
     } catch (err) {
-      toast.error(
-        err instanceof Error ? err.message : "Falha ao salvar recorrente.",
-      );
+      toast.error(mensagemErroSupabase(err, "Falha ao salvar recorrente."));
     }
   }
 

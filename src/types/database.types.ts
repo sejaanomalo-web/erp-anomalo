@@ -290,6 +290,39 @@ export interface CategoriaFinanceira {
   tipo: "entrada" | "saida";
   cor: string | null;
   ativa: boolean;
+  ordem: number;
+}
+
+export interface ContaFinanceira {
+  id: string;
+  empresa_id: string;
+  nome: string;
+  tipo: "banco" | "caixa" | "cartao_credito" | "investimento";
+  saldo_inicial: number;
+  data_saldo_inicial: string;
+  ativa: boolean;
+  ordem: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RecorrenteFinanceiro {
+  id: string;
+  empresa_id: string;
+  nome: string;
+  tipo: "entrada" | "saida";
+  valor: number;
+  categoria_id: string | null;
+  conta_id: string | null;
+  periodicidade: "mensal" | "anual" | "semanal";
+  dia_vencimento: number | null;
+  inicio: string;
+  fim: string | null;
+  ativo: boolean;
+  ultimo_lancamento_gerado: string | null;
+  observacoes: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface LancamentoFinanceiro {
@@ -297,6 +330,8 @@ export interface LancamentoFinanceiro {
   empresa_id: string;
   tipo: "entrada" | "saida";
   categoria_id: string | null;
+  conta_id: string | null;
+  recorrente_id: string | null;
   descricao: string;
   valor: number;
   data_competencia: string;
@@ -304,6 +339,7 @@ export interface LancamentoFinanceiro {
   data_pagamento: string | null;
   status: FinanceiroStatus;
   forma_pagamento: string | null;
+  origem: string | null;
   venda_id: string | null;
   vendedor_comissao_id: string | null;
   responsavel_id: string;
@@ -402,6 +438,8 @@ export interface Database {
       producoes: TableShape<Producao>;
       estoque_movimentacoes: TableShape<EstoqueMovimentacao>;
       categorias_financeiras: TableShape<CategoriaFinanceira>;
+      contas_financeiras: TableShape<ContaFinanceira>;
+      recorrentes_financeiros: TableShape<RecorrenteFinanceiro>;
       lancamentos_financeiros: TableShape<LancamentoFinanceiro>;
       audit_logs: TableShape<AuditLog>;
       anexos: TableShape<Anexo>;

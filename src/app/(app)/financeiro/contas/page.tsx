@@ -8,15 +8,19 @@ import { FinanceiroNav } from "@/components/financeiro/FinanceiroNav";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/feedback/EmptyState";
+import { toast } from "@/components/feedback/Toast";
 import { ContaDrawer } from "@/components/financeiro/ContaDrawer";
 import {
   useSaldoPorConta,
+  useExcluirConta,
   TIPO_CONTA_ROTULO,
   type ContaRow,
 } from "@/lib/queries/financeiro";
+import { mensagemErroSupabase } from "@/lib/errors";
 
 export default function ContasPage() {
   const saldos = useSaldoPorConta();
+  const excluir = useExcluirConta();
   const [open, setOpen] = useState(false);
   const [editar, setEditar] = useState<ContaRow | null>(null);
 
@@ -88,6 +92,42 @@ export default function ContasPage() {
               <p className="text-caption text-text-3">
                 Saldo inicial: {formatCurrency(s.conta.saldo_inicial)}
               </p>
+              <div
+                className="mt-2 flex justify-end gap-1"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    setEditar(s.conta);
+                    setOpen(true);
+                  }}
+                >
+                  Editar
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  disabled={excluir.isPending}
+                  onClick={async () => {
+                    if (!confirm(`Excluir a conta "${s.conta.nome}"?`)) return;
+                    try {
+                      await excluir.mutateAsync(s.conta.id);
+                      toast.success("Conta excluída.");
+                    } catch (err) {
+                      toast.error(
+                        mensagemErroSupabase(
+                          err,
+                          "Não foi possível excluir. A conta pode estar em uso.",
+                        ),
+                      );
+                    }
+                  }}
+                >
+                  Excluir
+                </Button>
+              </div>
             </Card>
           ))}
         </div>

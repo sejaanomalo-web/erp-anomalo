@@ -33,7 +33,7 @@ export interface VendedorOption {
 
 export function useVendedores() {
   return useQuery({
-    queryKey: queryKeys.vendedoresList(),
+    queryKey: queryKeys.vendedoresOptions(),
     queryFn: async (): Promise<VendedorOption[]> => {
       const supabase = createClient();
       const { data, error } = await supabase

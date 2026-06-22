@@ -34,6 +34,11 @@
   --accent-subtle: rgba(230, 214, 200, 0.12);
   --accent-strong: rgba(230, 214, 200, 0.40);
   --on-accent: #361908;
+  /* CTA principal: fundo marrom + texto claro (destaca no fundo escuro). */
+  --cta-bg: #5c3a22;
+  --cta-bg-hover: #6b4529;
+  --cta-fg: #ffffff;
+  --cta-border: rgba(230, 214, 200, 0.45);
   --logo-color: #ffffff;
   --spectral: #ffffff;
   --spectral-rgb: 255, 255, 255;
@@ -45,7 +50,7 @@
   --text-1: #ffffff;
   --text-2: #ece1d6;
   --text-3: #c3b2a2;
-  --text-4: #927a64;
+  --text-4: #a08a73; /* legendas: contraste ~4.9:1 sobre o fundo (era ~4:1) */
 
   --compose: var(--accent);
   --compose-foreground: var(--on-accent);
@@ -122,6 +127,11 @@
   --accent-subtle: rgba(54, 25, 8, 0.08);
   --accent-strong: rgba(54, 25, 8, 0.40);
   --on-accent: #e6d6c8;
+  /* CTA principal: marrom escuro sobre o fundo bege do tema claro. */
+  --cta-bg: #361908;
+  --cta-bg-hover: #4a2710;
+  --cta-fg: #e6d6c8;
+  --cta-border: #361908;
   --logo-color: #361908;
   --spectral: #ffffff;
   --spectral-rgb: 255, 255, 255;
@@ -133,7 +143,7 @@
   --text-1: #2a1607;
   --text-2: #4a3322;
   --text-3: #6e5640;
-  --text-4: #9b8470;
+  --text-4: #836b54; /* legendas: contraste ~3.5:1 sobre o bege (era ~2.5:1) */
 
   --compose: var(--accent);
   --compose-foreground: var(--on-accent);
