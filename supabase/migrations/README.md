@@ -12,6 +12,19 @@ Ordem de aplicação (manter ordem cronológica do prefixo):
 8. `20260520000008_notificacoes_e_tokens.sql` — Notificações in-app e tokens públicos.
 9. `20260520000009_rls_policies.sql` — Habilita RLS e cria todas as policies por papel.
 10. `20260520000010_storage_buckets.sql` — Buckets de storage e policies.
+11. `20260520000011_vendas_tipo_observacoes_fotos.sql` — Tipo/observações/fotos em vendas.
+12. `20260520000012_status_assistencia.sql` — Status de assistência.
+13. `20260520000013_profiles_permissoes_extras.sql` — Overrides aditivos de permissão.
+14. `20260520000014_google_calendar_tokens.sql` — Tokens OAuth Google + agenda_eventos.
+15. `20260520000015_vendas_taxa.sql` — Campo de taxa em vendas.
+16. `20260520000016_empresa_logos_bucket.sql` — Bucket de logos da empresa.
+17. `20260520000017_lancamentos_origem.sql` — Campo `origem` em lançamentos.
+18. `20260520000018_financeiro_contas_recorrentes.sql` — **Contas, recorrentes e vínculos do financeiro (idempotente).**
+
+> ⚠️ **Atenção:** a migração **018** é obrigatória para o módulo Financeiro funcionar
+> (sem ela, salvar lançamento/conta/recorrente falha). Ela é **idempotente** —
+> pode ser reaplicada com segurança. Se o banco foi montado apenas com
+> `_apply_all.sql`, confirme que o bloco da 018 (no final do arquivo) foi aplicado.
 
 ## Aplicar
 
