@@ -1140,7 +1140,7 @@ create index if not exists lancamentos_conta_idx
 create index if not exists lancamentos_recorrente_idx
   on lancamentos_financeiros(recorrente_id);
 create unique index if not exists lancamentos_recorrente_mes_uniq
-  on lancamentos_financeiros (recorrente_id, date_trunc('month', data_competencia))
+  on lancamentos_financeiros (recorrente_id, (date_trunc('month', data_competencia::timestamp)))
   where recorrente_id is not null;
 
 alter table contas_financeiras enable row level security;

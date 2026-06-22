@@ -74,8 +74,10 @@ create index if not exists lancamentos_recorrente_idx
   on lancamentos_financeiros(recorrente_id);
 
 -- 5. Idempotência da materialização: 1 lançamento por (recorrente, mês de competência)
+--    date_trunc precisa do cast ::timestamp: sobre `date`, o Postgres escolhe a
+--    variante timestamptz (apenas STABLE) e o índice exige IMMUTABLE (erro 42P17).
 create unique index if not exists lancamentos_recorrente_mes_uniq
-  on lancamentos_financeiros (recorrente_id, date_trunc('month', data_competencia))
+  on lancamentos_financeiros (recorrente_id, (date_trunc('month', data_competencia::timestamp)))
   where recorrente_id is not null;
 
 -- 6. RLS das novas tabelas. Alinhado ao padrão do financeiro: leitura para a
