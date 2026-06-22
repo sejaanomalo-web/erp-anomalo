@@ -36,20 +36,27 @@ export const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-1/2 top-1/2 z-modal w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-3xl bg-surface-1 border border-border-thin shadow-elevated p-xl data-[state=open]:animate-fade-in",
+        // Centralizado, mas com teto de altura e rolagem interna: em telas
+        // baixas (mobile/notebook) formulários altos rolam DENTRO do diálogo
+        // em vez de vazar pra fora da viewport — o que deixava o "X" e os
+        // botões inacessíveis. overscroll-contain evita rolar o fundo junto.
+        "fixed left-1/2 top-1/2 z-modal flex max-h-[90dvh] w-full max-w-lg -translate-x-1/2 -translate-y-1/2 flex-col overflow-y-auto overscroll-contain rounded-3xl bg-surface-1 border border-border-thin shadow-elevated p-xl data-[state=open]:animate-fade-in",
         className,
       )}
       {...props}
     >
-      {children}
       {!hideClose ? (
         <DialogPrimitive.Close
           aria-label="Fechar"
-          className="absolute right-md top-md text-text-3 hover:text-text-1 transition-colors duration-fast focus-visible:outline-none focus-visible:text-text-1"
+          // sticky: o botão de fechar fica sempre visível no topo, mesmo com
+          // o conteúdo rolado. Ancorado à direita via margin negativa pra
+          // compensar o padding do container sem ocupar espaço no fluxo.
+          className="sticky top-0 z-10 -mr-sm -mt-sm ml-auto -mb-sm flex h-8 w-8 items-center justify-center rounded-full bg-surface-1/80 text-text-3 backdrop-blur transition-colors duration-fast hover:text-text-1 focus-visible:outline-none focus-visible:text-text-1"
         >
           <X size={20} strokeWidth={1.8} />
         </DialogPrimitive.Close>
       ) : null}
+      {children}
     </DialogPrimitive.Content>
   </DialogPortal>
 ));
